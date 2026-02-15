@@ -898,12 +898,12 @@ def make_session_permanent():
 @app.route('/')
 def index():
     try:
-        featured_products = list(products_collection.find().sort('created_at', -1).limit(8))
-        new_arrivals = list(products_collection.find().sort('created_at', -1).limit(4))
+        featured_products = [enrich_product_for_display(p) for p in list(products_collection.find().sort('created_at', -1).limit(8))]
+        new_arrivals = [enrich_product_for_display(p) for p in list(products_collection.find().sort('created_at', -1).limit(4))]
         categories = products_collection.distinct('category')
 
         # Lightweight bestseller approximation by stock movement/availability
-        best_sellers = list(products_collection.find({'inventory': {'$gt': 0}}).sort('inventory', 1).limit(4))
+        best_sellers = [enrich_product_for_display(p) for p in list(products_collection.find({'inventory': {'$gt': 0}}).sort('inventory', 1).limit(4))]
 
         # Homepage visual blocks (placeholders can be replaced from admin later)
         hero_banners = [

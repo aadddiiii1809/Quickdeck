@@ -3,6 +3,7 @@
 {% block title %}QUICKDECK | Premium Footwear Store{% endblock %}
 
 {% block content %}
+{% set fallback_img = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MDAiIGhlaWdodD0iNzUwIiB2aWV3Qm94PSIwIDAgNjAwIDc1MCI+PHJlY3Qgd2lkdGg9IjYwMCIgaGVpZ2h0PSI3NTAiIGZpbGw9IiNmMWY1ZjkiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZmlsbD0iIzY0NzQ4YiIgZm9udC1zaXplPSIzMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIj5ObyBJbWFnZTwvdGV4dD48L3N2Zz4=' %}
 <section class="hero-slider-wrap">
     <div id="homeHeroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
         <div class="carousel-indicators">
@@ -129,12 +130,12 @@
             {% for product in featured_products %}
             {% set sale_price = product.get('meesho_price') or product.get('price') or 0 %}
             {% set mrp = product.get('mrp') or sale_price %}
-            {% set img = product.get('image_1') or url_for('static', filename='images/default-product.jpg') %}
+            {% set img = product.get('display_image') or product.get('image_1') or fallback_img %}
             <div class="col-6 col-md-4 col-lg-3">
                 <div class="store-card h-100">
                     <a href="{{ url_for('product_detail', product_id=product._id|string) }}" class="text-decoration-none">
                         <div class="store-img-wrap">
-                            <img src="{{ img }}" alt="{{ product.get('product_name', 'Product') }}">
+                            <img src="{{ img }}" alt="{{ product.get('product_name', 'Product') }}" onerror="this.onerror=null;this.src='{{ fallback_img }}';">
                             {% if mrp > sale_price %}
                             <span class="sale-badge">{{ (((mrp - sale_price) / mrp) * 100)|int }}% OFF</span>
                             {% endif %}
