@@ -47,9 +47,23 @@
         .brand-logo {
             color: var(--brand-ink);
             text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            min-height: 44px;
+        }
+
+        .brand-logo img {
+            max-height: 52px;
+            width: auto;
+            display: block;
+        }
+
+        .brand-logo-fallback {
             font-weight: 700;
             letter-spacing: 0.08em;
             font-size: 1.4rem;
+            font-family: 'Cormorant Garamond', serif;
+            display: none;
         }
 
         .search-wrap {
@@ -195,7 +209,10 @@
         <div class="container py-3">
             <div class="row align-items-center g-3">
                 <div class="col-6 col-md-3">
-                    <a class="brand-logo serif" href="{{ url_for('index') }}">QUICKDECK</a>
+                    <a class="brand-logo" href="{{ url_for('index') }}">
+                        <img src="{{ url_for('static', filename='images/logos/Brand_logo.jpeg') }}" alt="Quickdeck" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';">
+                        <span class="brand-logo-fallback">QUICKDECK</span>
+                    </a>
                 </div>
                 <div class="col-md-5 d-none d-md-block">
                     <form action="{{ url_for('products') }}" method="GET" class="search-wrap">
