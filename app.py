@@ -39,6 +39,13 @@ app.config['MAX_CONTENT_LENGTH'] = int(os.getenv('MAX_UPLOAD_MB', '50')) * 1024 
 
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
+DEFAULT_PRODUCT_IMAGE = (
+    'data:image/svg+xml;base64,'
+    'PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MDAiIGhlaWdodD0iNzUwIiB2aWV3Qm94PSIwIDAgNjAwIDc1MCI+'
+    'PHJlY3Qgd2lkdGg9IjYwMCIgaGVpZ2h0PSI3NTAiIGZpbGw9IiNmMWY1ZjkiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZmlsbD0iIzY0NzQ4YiIg'
+    'Zm9udC1zaXplPSIzMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIj5ObyBJbWFnZTwvdGV4dD48L3N2Zz4='
+)
+
 # Database Setup
 MONGODB_URI = os.getenv('MONGODB_URI', 'mongodb://localhost:27017/')
 client = MongoClient(MONGODB_URI)
@@ -53,7 +60,7 @@ reviews_collection = db['reviews']
 coupons_collection = db['coupons']
 returns_collection = db['returns']
 
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'jfif', 'avif'}
 BULK_ALLOWED_EXTENSIONS = {'csv', 'xlsx'}
 BULK_REQUIRED_ATTRIBUTES = [
     'SKU',
@@ -93,6 +100,19 @@ BULK_REQUIRED_NORMALIZED = set()
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def image_file_to_data_url(file_obj):
+    """Convert uploaded image to data URL so it persists in Mongo on stateless hosts."""
+    raw = file_obj.read()
+    if not raw:
+        return ''
+    mime_type = (file_obj.mimetype or '').strip().lower()
+    if not mime_type.startswith('image/'):
+        ext = file_obj.filename.rsplit('.', 1)[1].lower() if '.' in (file_obj.filename or '') else 'jpeg'
+        mime_type = f'image/{ext}'
+    encoded = base64.b64encode(raw).decode('ascii')
+    return f'data:{mime_type};base64,{encoded}'
 
 
 def normalize_bulk_header(value):
@@ -181,7 +201,7 @@ def collect_product_images(product):
         urls.append(fallback_single)
 
     if not urls:
-        urls.append('/static/images/default-product.jpg')
+        urls.append(DEFAULT_PRODUCT_IMAGE)
     return urls
 
 
@@ -216,7 +236,8 @@ def enrich_product_for_display(product):
         return product
     images = collect_product_images(product)
     product['display_images'] = images
-    product['display_image'] = images[0] if images else '/static/images/default-product.jpg'
+    product['display_image'] = images[0] if images else DEFAULT_PRODUCT_IMAGE
+    product['display_fallback'] = DEFAULT_PRODUCT_IMAGE
     product['display_sizes'] = collect_product_sizes(product)
     return product
 
@@ -455,7 +476,7 @@ def build_product_from_bulk_row(row, index_map):
         'mfg_address': get_from_row(row, index_map, 'Manufacturer Address'),
         'category': get_from_row(row, index_map, 'Type') or 'General',
         'inventory': inventory,
-        'image_1': image_urls[0] if image_urls else 'https://via.placeholder.com/400x400',
+        'image_1': image_urls[0] if image_urls else DEFAULT_PRODUCT_IMAGE,
         'created_at': now,
         'updated_at': now
     }
@@ -1653,22 +1674,58 @@ function updateStatus(orderId) {
 @admin_required
 def admin_add_product():
     if request.method == 'POST':
+        uploaded_images = []
+        skipped_images = 0
+        inline_limit_mb = parse_int(os.getenv('INLINE_IMAGE_MAX_MB', '4'), 4)
+        inline_limit_bytes = max(inline_limit_mb, 1) * 1024 * 1024
+        uploaded_files = request.files.getlist('product_images')
+
+        for file_obj in uploaded_files:
+            if not file_obj or not file_obj.filename:
+                continue
+            if not allowed_file(file_obj.filename):
+                skipped_images += 1
+                continue
+
+            data_url = image_file_to_data_url(file_obj)
+            if data_url and len(data_url) <= (inline_limit_bytes * 2):
+                uploaded_images.append(data_url)
+                continue
+
+            safe_name = secure_filename(file_obj.filename)
+            stem, ext = os.path.splitext(safe_name)
+            unique_name = f"{datetime.now().strftime('%Y%m%d%H%M%S%f')}_{stem}{ext.lower()}"
+            save_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_name)
+            file_obj.stream.seek(0)
+            file_obj.save(save_path)
+            uploaded_images.append(f"/static/images/products/{unique_name}")
+
+        primary_image = uploaded_images[0] if uploaded_images else DEFAULT_PRODUCT_IMAGE
+
         product_data = {
             'product_name': request.form.get('name', 'New Product'),
             'category': request.form.get('category', 'General'),
             'description': request.form.get('description', ''),
-            'sku_id': request.form.get('sku', f'SKU-{datetime.now().strftime("%Y%m%d%H%M%S")}'),
-            'mrp': float(request.form.get('mrp', 0)),
-            'price': float(request.form.get('price', 0)),
-            'meesho_price': float(request.form.get('price', 0)),
+            'sku_id': request.form.get('sku') or f'SKU-{datetime.now().strftime("%Y%m%d%H%M%S")}',
+            'mrp': parse_number(request.form.get('mrp', 0), 0),
+            'price': parse_number(request.form.get('price', 0), 0),
+            'meesho_price': parse_number(request.form.get('price', 0), 0),
             'material': request.form.get('material', ''),
             'heel_type': request.form.get('heel_type', ''),
-            'inventory': int(request.form.get('stock', 0)),
+            'inventory': parse_int(request.form.get('stock', 0), 0),
             'sizes': [s.strip() for s in request.form.get('sizes', '').split(',') if s.strip()],
-            'image_1': 'https://via.placeholder.com/400x400',
+            'image_1': primary_image,
             'created_at': datetime.now(),
             'updated_at': datetime.now()
         }
+        for idx, image_url in enumerate(uploaded_images[:8], start=1):
+            product_data[f'image_{idx}'] = image_url
+        if uploaded_images:
+            product_data['images'] = uploaded_images
+        product_data['image'] = primary_image
+
+        if skipped_images > 0:
+            flash(f'{skipped_images} image file(s) were skipped because file type is not supported.', 'warning')
 
         products_collection.insert_one(product_data)
         flash('Product added successfully!', 'success')

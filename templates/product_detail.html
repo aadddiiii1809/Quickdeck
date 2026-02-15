@@ -3,9 +3,10 @@
 {% block title %}{{ product.get('product_name', 'Product') }} | QUICKDECK{% endblock %}
 
 {% block content %}
+{% set fallback_img = product.get('display_fallback') or 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MDAiIGhlaWdodD0iNzUwIiB2aWV3Qm94PSIwIDAgNjAwIDc1MCI+PHJlY3Qgd2lkdGg9IjYwMCIgaGVpZ2h0PSI3NTAiIGZpbGw9IiNmMWY1ZjkiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZmlsbD0iIzY0NzQ4YiIgZm9udC1zaXplPSIzMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIj5ObyBJbWFnZTwvdGV4dD48L3N2Zz4=' %}
 {% set sale_price = product.get('meesho_price') or product.get('price') or 0 %}
 {% set mrp = product.get('mrp') or sale_price %}
-{% set gallery = product.get('display_images') if product.get('display_images') else [url_for('static', filename='images/default-product.jpg')] %}
+{% set gallery = product.get('display_images') if product.get('display_images') else [fallback_img] %}
 {% set primary_img = gallery[0] %}
 {% set size_list = product.get('display_sizes') if product.get('display_sizes') else [] %}
 <section class="py-5">
@@ -13,13 +14,13 @@
         <div class="row g-5">
             <div class="col-lg-6">
                 <div class="detail-main-image mb-3">
-                    <img id="mainImage" src="{{ primary_img }}" alt="{{ product.get('product_name', 'Product') }}" loading="eager" decoding="async">
+                    <img id="mainImage" src="{{ primary_img }}" alt="{{ product.get('product_name', 'Product') }}" loading="eager" decoding="async" onerror="this.onerror=null;this.src='{{ fallback_img }}';">
                 </div>
                 <div class="row g-2">
                     {% for img in gallery %}
                     <div class="col-3">
                         <button type="button" class="thumb-btn" onclick="changeImage('{{ img }}')">
-                            <img src="{{ img }}" alt="Thumbnail" loading="lazy" decoding="async">
+                            <img src="{{ img }}" alt="Thumbnail" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='{{ fallback_img }}';">
                         </button>
                     </div>
                     {% endfor %}
@@ -87,12 +88,12 @@
                 {% for related in related_products %}
                 {% set r_price = related.get('meesho_price') or related.get('price') or 0 %}
                 {% set r_mrp = related.get('mrp') or r_price %}
-                {% set r_img = related.get('display_image') or url_for('static', filename='images/default-product.jpg') %}
+                {% set r_img = related.get('display_image') or fallback_img %}
                 <div class="col-6 col-md-4 col-lg-3">
                     <div class="store-card h-100">
                         <a href="{{ url_for('product_detail', product_id=related._id|string) }}" class="text-decoration-none">
                             <div class="store-img-wrap">
-                                <img src="{{ r_img }}" alt="Related product" loading="lazy" decoding="async">
+                                <img src="{{ r_img }}" alt="Related product" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='{{ fallback_img }}';">
                             </div>
                             <div class="p-3">
                                 <p class="small text-muted mb-1">{{ related.get('category', 'Footwear') }}</p>
