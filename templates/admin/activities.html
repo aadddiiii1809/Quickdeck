@@ -1,0 +1,80 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Activities - QUICKDECK Admin{% endblock %}
+{% block page_title %}Recent Activities{% endblock %}
+{% block page_subtitle %}Track latest orders, products, and customer events{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Activities</li>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Activity Feed</h5>
+        <span class="badge bg-primary">{{ total_activities }} total</span>
+    </div>
+    <div class="card-body">
+        {% if activities and activities|length > 0 %}
+        <div class="activities-list">
+            {% for activity in activities %}
+            <div class="activity-row">
+                <div class="activity-icon">
+                    <i class="{{ activity.icon }}"></i>
+                </div>
+                <div class="activity-content">
+                    <div class="activity-text">{{ activity.text }}</div>
+                    <div class="activity-time">{{ activity.time }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5 text-muted">
+            <i class="fas fa-calendar-check fa-2x mb-3"></i>
+            <p class="mb-0">No activities found.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.activities-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.activity-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #fff;
+}
+
+.activity-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: #eff6ff;
+    color: #2563eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.activity-text {
+    font-weight: 500;
+    color: #1e293b;
+}
+
+.activity-time {
+    color: #64748b;
+    font-size: 12px;
+}
+</style>
+{% endblock %}

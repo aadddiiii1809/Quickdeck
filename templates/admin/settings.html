@@ -1,0 +1,42 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Settings - QUICKDECK Admin{% endblock %}
+{% block page_title %}Store Settings{% endblock %}
+{% block page_subtitle %}Operational and commerce configuration overview{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header"><h5 class="mb-0">General Configuration</h5></div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Store Name</label>
+                <input class="form-control" value="{{ settings.store_name }}" readonly>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Support Email</label>
+                <input class="form-control" value="{{ settings.support_email }}" readonly>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Currency</label>
+                <input class="form-control" value="{{ settings.currency }}" readonly>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Tax Rate (%)</label>
+                <input class="form-control" value="{{ settings.tax_rate }}" readonly>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Low Stock Threshold</label>
+                <input class="form-control" value="{{ settings.low_stock_threshold }}" readonly>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Order Auto Confirm</label>
+                <input class="form-control" value="{{ 'Enabled' if settings.order_auto_confirm else 'Disabled' }}" readonly>
+            </div>
+        </div>
+        <div class="alert alert-info mt-4 mb-0">
+            Settings are currently read-only from admin UI. Wire these fields to DB/env update APIs for full control.
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.env
+
+# Local/replit
+local/
+*.log
+
+# Node
+catalog_portal/nextjs/node_modules/
+catalog_portal/nextjs/.next/
+
+# IDE/OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Accidental repo snapshot folder
+git/

@@ -1,0 +1,66 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Returns - QUICKDECK Admin{% endblock %}
+{% block page_title %}Returns & Refunds{% endblock %}
+{% block page_subtitle %}Manage return requests and refund progress{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header"><h5 class="mb-0">Return Requests</h5></div>
+    <div class="card-body">
+        {% if requests %}
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>User ID</th>
+                        <th>Reason</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in requests %}
+                    <tr>
+                        <td>#{{ r.get('order_id', '')|truncate(10, True, '') }}</td>
+                        <td>{{ r.get('user_id', '')|truncate(12, True, '') }}</td>
+                        <td>{{ r.get('reason', '') }}</td>
+                        <td>{{ r.get('status', 'Requested') }}</td>
+                        <td>{{ r.get('created_at').strftime('%d %b %Y') if r.get('created_at') else 'N/A' }}</td>
+                        <td>
+                            <select class="form-select form-select-sm return-status" data-return-id="{{ r._id|string }}">
+                                {% for s in ['Requested', 'Approved', 'Picked Up', 'Refunded', 'Rejected'] %}
+                                <option value="{{ s }}" {% if r.get('status') == s %}selected{% endif %}>{{ s }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">No return requests.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.querySelectorAll('.return-status').forEach(el => {
+    el.addEventListener('change', function() {
+        const formData = new FormData();
+        formData.append('status', this.value);
+        fetch(`/admin/returns/${this.dataset.returnId}/status`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(r => r.json())
+        .then(data => { if (!data.success) alert(data.message || 'Update failed'); });
+    });
+});
+</script>
+{% endblock %}

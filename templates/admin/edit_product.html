@@ -1,0 +1,61 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Edit Product - QUICKDECK Admin{% endblock %}
+{% block page_title %}Edit Product{% endblock %}
+{% block page_subtitle %}Update catalog details, pricing and inventory{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <form method="POST">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Product Name</label>
+                    <input type="text" name="name" class="form-control" value="{{ product.get('product_name') or product.get('name') }}" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Category</label>
+                    <input type="text" name="category" class="form-control" value="{{ product.get('category', '') }}" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">SKU</label>
+                    <input type="text" name="sku" class="form-control" value="{{ product.get('sku_id') or product.get('sku') or '' }}">
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Description</label>
+                    <textarea name="description" class="form-control" rows="3">{{ product.get('description', '') }}</textarea>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">MRP</label>
+                    <input type="number" step="0.01" name="mrp" class="form-control" value="{{ product.get('mrp', 0) }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Selling Price</label>
+                    <input type="number" step="0.01" name="price" class="form-control" value="{{ product.get('price') or product.get('meesho_price') or 0 }}" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Stock</label>
+                    <input type="number" name="stock" class="form-control" value="{{ product.get('inventory') or product.get('stock') or 0 }}" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Sizes</label>
+                    <input type="text" name="sizes" class="form-control" value="{{ (product.get('sizes') or [])|join(',') }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Material</label>
+                    <input type="text" name="material" class="form-control" value="{{ product.get('material', '') }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Heel Type</label>
+                    <input type="text" name="heel_type" class="form-control" value="{{ product.get('heel_type', '') }}">
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Update Product</button>
+                <a href="{{ url_for('admin_products') }}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

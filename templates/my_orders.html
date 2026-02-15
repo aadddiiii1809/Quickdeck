@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}My Orders - QUICKDECK{% endblock %}
+
+{% block content %}
+<section class="py-4 border-bottom bg-light">
+    <div class="container">
+        <h1 class="serif mb-1">My Orders</h1>
+        <p class="text-muted mb-0">Track purchases, download invoices, request returns.</p>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        {% if orders %}
+        <div class="card border-0 shadow-sm">
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Payment</th>
+                            <th>Total</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for o in orders %}
+                        <tr>
+                            <td>#{{ o._id|string|truncate(10, True, '') }}</td>
+                            <td>{{ o.get('order_date').strftime('%d %b %Y') if o.get('order_date') else 'N/A' }}</td>
+                            <td>{{ o.get('status', 'Pending') }}</td>
+                            <td>{{ o.get('payment_method', 'cod')|upper }} / {{ o.get('payment_status', 'Pending') }}</td>
+                            <td>Rs {{ o.get('total_amount', 0)|round|int }}</td>
+                            <td class="d-flex gap-2">
+                                <a href="{{ url_for('order_success', order_id=o._id|string) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                <a href="{{ url_for('download_invoice', order_id=o._id|string) }}" class="btn btn-sm btn-outline-dark">Invoice</a>
+                                <button class="btn btn-sm btn-outline-danger return-btn" data-order-id="{{ o._id|string }}">Return</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <h4>No orders yet</h4>
+            <a href="{{ url_for('products') }}" class="btn btn-brand mt-2">Start Shopping</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.querySelectorAll('.return-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const orderId = this.dataset.orderId;
+        const reason = prompt('Reason for return:');
+        if (!reason) return;
+        const formData = new FormData();
+        formData.append('reason', reason);
+        fetch(`/return/request/${orderId}`, { method: 'POST', body: formData })
+            .then(r => r.json())
+            .then(data => {
+                alert(data.message || (data.success ? 'Return requested' : 'Failed'));
+                if (data.success) location.reload();
+            });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,166 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Add Product - Admin{% endblock %}
+
+{% block content %}
+<section class="admin-header bg-dark text-white py-4">
+    <div class="container">
+        <h1><i class="fas fa-plus-circle me-3"></i>Add New Product</h1>
+        <p class="text-white-50">Enter full footwear specifications for QUICKDECK inventory.</p>
+    </div>
+</section>
+
+<section class="admin-section py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="admin-form-card shadow p-4 rounded-4 bg-white">
+                    <form method="POST" enctype="multipart/form-data">
+
+                        <ul class="nav nav-pills mb-4" id="pills-tab" role="tablist">
+                            <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#general" type="button">General Info</button></li>
+                            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#gallery" type="button">Product Gallery</button></li>
+                            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#pricing" type="button">Pricing & Tax</button></li>
+                            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#design" type="button">Design & Material</button></li>
+                            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#logistics" type="button">Logistics & Mfg</button></li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <div class="tab-pane fade show active" id="general">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Product Name</label>
+                                        <input type="text" class="form-control" name="name" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Category</label>
+                                        <select class="form-select" name="category" required>
+                                            <option value="Heels">Heels</option>
+                                            <option value="Sneakers">Sneakers</option>
+                                            <option value="Sandals">Sandals</option>
+                                            <option value="Flats">Flats</option>
+                                            <option value="Slip-ons">Slip-ons</option>
+                                            <option value="Boots">Boots</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">Description</label>
+                                        <textarea class="form-control" name="description" rows="3" required></textarea>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Generic Name</label>
+                                        <input type="text" class="form-control" name="generic_name" value="Ladies Footwear">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="gallery">
+                                <div class="mb-4 p-4 border rounded-3 bg-light">
+                                    <label class="form-label fw-bold"><i class="fas fa-images me-2"></i>Upload Multiple Images</label>
+                                    <input type="file" name="product_images" id="imageInput" class="form-control" multiple accept="image/*">
+                                    <div class="form-text text-muted mt-2">
+                                        <i class="fas fa-info-circle me-1"></i> Tip: Select all product angles at once. The first image will be the primary photo.
+                                    </div>
+
+                                    <div id="imagePreview" class="row g-2 mt-3"></div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="pricing">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label">MRP (₹)</label>
+                                        <input type="number" class="form-control" name="mrp" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Selling Price (₹)</label>
+                                        <input type="number" class="form-control" name="price" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Wrong/Defective Return Price (₹)</label>
+                                        <input type="number" class="form-control" name="return_price">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">HSN Code</label>
+                                        <input type="text" class="form-control" name="hsn_code">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">GST %</label>
+                                        <input type="text" class="form-control" name="gst" value="18%">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">SKU</label>
+                                        <input type="text" class="form-control" name="sku" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="design">
+                                <div class="row g-3">
+                                    <div class="col-md-4"><label class="form-label">Ornamentation</label><input type="text" class="form-control" name="ornamentation"></div>
+                                    <div class="col-md-4"><label class="form-label">Pattern</label><input type="text" class="form-control" name="pattern"></div>
+                                    <div class="col-md-4"><label class="form-label">Color</label><input type="text" class="form-control" name="color"></div>
+                                    <div class="col-md-3"><label class="form-label">Material</label><input type="text" class="form-control" name="material"></div>
+                                    <div class="col-md-3"><label class="form-label">Sole Material</label><input type="text" class="form-control" name="sole_material"></div>
+                                    <div class="col-md-3"><label class="form-label">Heel Type</label><input type="text" class="form-control" name="heel_type"></div>
+                                    <div class="col-md-3"><label class="form-label">Heel Height (in)</label><input type="text" class="form-control" name="heel_height_in"></div>
+                                    <div class="col-md-4"><label class="form-label">Toe Type</label><input type="text" class="form-control" name="toe_type"></div>
+                                    <div class="col-md-4"><label class="form-label">Ankle Height</label><input type="text" class="form-control" name="ankle_height"></div>
+                                    <div class="col-md-4"><label class="form-label">Fastening & Back Detail</label><input type="text" class="form-control" name="fastening"></div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="logistics">
+                                <div class="row g-3">
+                                    <div class="col-md-4"><label class="form-label">Net Weight (gms)</label><input type="number" class="form-control" name="weight"></div>
+                                    <div class="col-md-4"><label class="form-label">Net Quantity</label><input type="number" class="form-control" name="quantity" value="1"></div>
+                                    <div class="col-md-4"><label class="form-label">Stock Inventory</label><input type="number" class="form-control" name="stock" required></div>
+                                    <div class="col-md-6"><label class="form-label">Manufacturer Name</label><input type="text" class="form-control" name="mfg_name" value="QUICKDECK"></div>
+                                    <div class="col-md-6"><label class="form-label">Manufacturer Address</label><input type="text" class="form-control" name="mfg_address" value="Chembur, Mumbai"></div>
+                                    <div class="col-md-6"><label class="form-label">Country of Origin</label><input type="text" class="form-control" name="origin" value="India"></div>
+                                    <div class="col-md-6"><label class="form-label">Length & Width Size</label><input type="text" class="form-control" name="sizes" placeholder="e.g., 5,6,7,8"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-5 d-flex gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg px-5 shadow-sm">
+                                <i class="fas fa-save me-2"></i>Save Product
+                            </button>
+                            <a href="{{ url_for('admin_products') }}" class="btn btn-outline-secondary btn-lg px-4">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+document.getElementById('imageInput').addEventListener('change', function(event) {
+    const preview = document.getElementById('imagePreview');
+    preview.innerHTML = '';
+    const files = event.target.files;
+
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            const col = document.createElement('div');
+            col.className = 'col-3';
+            col.innerHTML = `
+                <div class="position-relative">
+                    <img src="${e.target.result}" class="img-thumbnail w-100" style="height: 100px; object-fit: cover;">
+                    <span class="badge bg-dark position-absolute top-0 start-0 m-1">${i + 1}</span>
+                </div>
+            `;
+            preview.appendChild(col);
+        }
+        reader.readAsDataURL(file);
+    }
+});
+</script>
+{% endblock %}

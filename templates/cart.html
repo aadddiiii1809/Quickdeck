@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Shopping Cart - QUICKDECK{% endblock %}
+
+{% block content %}
+<section class="py-4 border-bottom bg-light">
+    <div class="container">
+        <h1 class="serif mb-1">Shopping Cart</h1>
+        <p class="text-muted mb-0">Review and manage your selected items.</p>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        {% if cart_items %}
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-0">
+                        {% for item in cart_items %}
+                        <div class="p-3 border-bottom d-flex gap-3 align-items-center">
+                            <div style="width:90px;height:90px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;flex-shrink:0;">
+                                <img src="{{ item.product.image if item.product.image else url_for('static', filename='images/default-product.jpg') }}"
+                                     alt="{{ item.product.name }}"
+                                     style="width:100%;height:100%;object-fit:contain;padding:8px;">
+                            </div>
+
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">{{ item.product.name }}</h6>
+                                <p class="small text-muted mb-1">{{ item.product.category }}</p>
+                                <div class="fw-bold">Rs {{ item.product.price|round|int }}</div>
+                                {% if not item.is_available %}
+                                <div class="small text-danger mt-1">This product is no longer available.</div>
+                                {% endif %}
+                            </div>
+
+                            <div style="width:110px;">
+                                <label class="small text-muted">Quantity</label>
+                                <input type="number"
+                                       class="form-control form-control-sm quantity-input"
+                                       value="{{ item.quantity }}"
+                                       min="1"
+                                       max="{{ item.product.stock if item.product.stock > 0 else 1 }}"
+                                       data-cart-id="{{ item._id }}">
+                            </div>
+
+                            <div style="width:130px;" class="text-end">
+                                <div class="small text-muted">Subtotal</div>
+                                <div class="fw-bold">Rs {{ item.subtotal|round|int }}</div>
+                            </div>
+
+                            <button class="btn btn-outline-danger btn-sm remove-item-btn" data-cart-id="{{ item._id }}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="mb-3">Order Summary</h5>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Items Total</span>
+                            <strong>Rs {{ total|round|int }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Shipping</span>
+                            <strong class="text-success">FREE</strong>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="fw-bold">Total</span>
+                            <span class="fw-bold">Rs {{ total|round|int }}</span>
+                        </div>
+                        <a href="{{ url_for('checkout') }}" class="btn btn-brand w-100 py-2">Proceed to Checkout</a>
+                        <a href="{{ url_for('products') }}" class="btn btn-brand-outline w-100 py-2 mt-2">Continue Shopping</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-bag-shopping fa-3x text-muted mb-3"></i>
+            <h4>Your cart is empty</h4>
+            <p class="text-muted">Add products to start your order.</p>
+            <a href="{{ url_for('products') }}" class="btn btn-brand px-4 py-2">Browse Products</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.querySelectorAll('.quantity-input').forEach((input) => {
+    input.addEventListener('change', function() {
+        const cartId = this.dataset.cartId;
+        const quantity = this.value;
+        const formData = new FormData();
+        formData.append('quantity', quantity);
+        fetch(`/update_cart/${cartId}`, { method: 'POST', body: formData })
+            .then(r => r.json())
+            .then(data => { if (data.success) location.reload(); });
+    });
+});
+
+document.querySelectorAll('.remove-item-btn').forEach((btn) => {
+    btn.addEventListener('click', function() {
+        if (!confirm('Remove this item from cart?')) return;
+        const cartId = this.dataset.cartId;
+        fetch(`/remove_from_cart/${cartId}`, { method: 'POST' })
+            .then(r => r.json())
+            .then(data => { if (data.success) location.reload(); });
+    });
+});
+</script>
+{% endblock %}

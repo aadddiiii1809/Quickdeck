@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Contact Us - QUICKDECK{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1><i class="fas fa-envelope me-3"></i>Contact Us</h1>
+        <p class="text-white-50">Get in touch with us</p>
+    </div>
+</section>
+
+<section class="contact-section py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 mb-4">
+                <div class="contact-info-card">
+                    <h3 class="mb-4"><i class="fas fa-building me-2"></i>QUICKDECK</h3>
+                    <p class="lead">Your Gateway to Global Retail</p>
+                    
+                    <div class="contact-detail mt-4">
+                        <h5><i class="fas fa-map-marker-alt me-2 text-primary"></i>Address</h5>
+                        <p>Vasant Nagar, G-70/2<br>
+                        Thakkar Bappa Colony<br>
+                        Near Gopal Hotel<br>
+                        Chembur, Mumbai<br>
+                        Maharashtra, 400071</p>
+                    </div>
+                    
+                    <div class="contact-detail mt-4">
+                        <h5><i class="fas fa-phone me-2 text-primary"></i>Phone Numbers</h5>
+                        <p><a href="tel:8097130846">8097130846</a></p>
+                        <p><a href="tel:9619328102">9619328102</a></p>
+                    </div>
+                    
+                    <div class="contact-detail mt-4">
+                        <h5><i class="fas fa-shopping-bag me-2 text-primary"></i>Also Available On</h5>
+                        <div class="platform-badges">
+                            <span class="badge bg-primary me-2"><i class="fab fa-amazon me-1"></i>Amazon</span>
+                            <span class="badge bg-primary"><i class="fas fa-shopping-bag me-1"></i>Flipkart</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <div class="contact-form-card">
+                    <h4 class="mb-4">Send us a Message</h4>
+                    <form id="contactForm">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Phone</label>
+                            <input type="tel" class="form-control" id="phone" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Message</label>
+                            <textarea class="form-control" id="message" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            <i class="fas fa-paper-plane me-2"></i>Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('contactForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    alert('Thank you for contacting us! We will get back to you soon.');
+    this.reset();
+});
+</script>
+{% endblock %}

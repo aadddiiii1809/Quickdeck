@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}QUICKDECK | Premium Footwear{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --brand-ink: #111827;
+            --brand-muted: #6b7280;
+            --brand-bg: #f8fafc;
+            --brand-border: #e5e7eb;
+            --brand-accent: #c08457;
+            --brand-accent-dark: #9a5f35;
+        }
+
+        body {
+            font-family: 'Manrope', sans-serif;
+            color: var(--brand-ink);
+            background: #fff;
+        }
+
+        .serif {
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        .top-strip {
+            background: var(--brand-ink);
+            color: #fff;
+            font-size: 12px;
+            letter-spacing: 0.08em;
+        }
+
+        .main-header {
+            background: #fff;
+            border-bottom: 1px solid var(--brand-border);
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+        }
+
+        .brand-logo {
+            color: var(--brand-ink);
+            text-decoration: none;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            font-size: 1.4rem;
+        }
+
+        .search-wrap {
+            position: relative;
+        }
+
+        .search-wrap i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--brand-muted);
+            font-size: 13px;
+        }
+
+        .search-input {
+            border: 1px solid var(--brand-border);
+            border-radius: 999px;
+            padding: 9px 14px 9px 36px;
+            font-size: 14px;
+            width: 100%;
+            background: #fff;
+        }
+
+        .icon-link {
+            color: var(--brand-ink);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cart-badge {
+            min-width: 20px;
+            height: 20px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            background: var(--brand-accent);
+            color: #fff;
+            padding: 0 6px;
+            font-weight: 700;
+        }
+
+        .category-nav {
+            border-top: 1px solid var(--brand-border);
+            border-bottom: 1px solid var(--brand-border);
+            background: #fff;
+        }
+
+        .category-link {
+            color: var(--brand-ink);
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 12px 4px;
+            display: inline-block;
+            border-bottom: 2px solid transparent;
+        }
+
+        .category-link:hover {
+            border-color: var(--brand-accent);
+            color: var(--brand-accent-dark);
+        }
+
+        .btn-brand {
+            background: var(--brand-ink);
+            color: #fff;
+            border: 1px solid var(--brand-ink);
+            border-radius: 0;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+
+        .btn-brand:hover {
+            background: #000;
+            color: #fff;
+            border-color: #000;
+        }
+
+        .btn-brand-outline {
+            border: 1px solid var(--brand-ink);
+            color: var(--brand-ink);
+            border-radius: 0;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            font-size: 12px;
+            background: #fff;
+        }
+
+        .btn-brand-outline:hover {
+            background: var(--brand-ink);
+            color: #fff;
+        }
+
+        footer {
+            background: #0f172a;
+            color: #e2e8f0;
+            margin-top: 64px;
+        }
+
+        .footer-title {
+            color: #fff;
+            font-size: 13px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 14px;
+        }
+
+        .footer-link {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 14px;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        .footer-link:hover {
+            color: #fff;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="top-strip py-2">
+        <div class="container d-flex justify-content-between align-items-center">
+            <span>FREE SHIPPING ON PREPAID ORDERS</span>
+            <span>EASY RETURNS | SECURE PAYMENTS</span>
+        </div>
+    </div>
+
+    <header class="main-header">
+        <div class="container py-3">
+            <div class="row align-items-center g-3">
+                <div class="col-6 col-md-3">
+                    <a class="brand-logo serif" href="{{ url_for('index') }}">QUICKDECK</a>
+                </div>
+                <div class="col-md-5 d-none d-md-block">
+                    <form action="{{ url_for('products') }}" method="GET" class="search-wrap">
+                        <i class="fas fa-search"></i>
+                        <input class="search-input" type="text" name="q" placeholder="Search heels, flats, sandals...">
+                    </form>
+                </div>
+                <div class="col-6 col-md-4 text-end d-flex justify-content-end gap-3">
+                    {% if session.get('user_id') %}
+                    <a class="icon-link" href="{{ url_for('wishlist') }}"><i class="fas fa-heart"></i> Wishlist <span class="cart-badge">{{ storefront_wishlist_count }}</span></a>
+                    <a class="icon-link" href="{{ url_for('cart') }}"><i class="fas fa-bag-shopping"></i> Cart <span class="cart-badge">{{ storefront_cart_count }}</span></a>
+                    <a class="icon-link" href="{{ url_for('logout') }}"><i class="fas fa-right-from-bracket"></i> Logout</a>
+                    {% else %}
+                    <a class="icon-link" href="{{ url_for('login') }}"><i class="fas fa-user"></i> Login</a>
+                    <a class="icon-link" href="{{ url_for('signup') }}"><i class="fas fa-user-plus"></i> Join</a>
+                    {% endif %}
+                    {% if session.get('is_admin') %}
+                    <a class="icon-link" href="{{ url_for('admin_dashboard') }}"><i class="fas fa-gauge"></i> Admin</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="category-nav">
+            <div class="container d-flex flex-wrap justify-content-center gap-4">
+                <a class="category-link" href="{{ url_for('products') }}">All</a>
+                {% for c in storefront_categories %}
+                <a class="category-link" href="{{ url_for('products', category=c) }}">{{ c }}</a>
+                {% endfor %}
+            </div>
+        </div>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="container mt-3">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ 'danger' if category == 'error' else ('warning' if category == 'warning' else 'success') }} mb-2">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="pt-5 pb-4">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <h5 class="serif mb-3">QUICKDECK</h5>
+                    <p class="mb-2 text-light-emphasis">Premium footwear crafted for daily elegance and festive moments.</p>
+                </div>
+                <div class="col-md-2">
+                    <h6 class="footer-title">Shop</h6>
+                    <a class="footer-link" href="{{ url_for('products') }}">All Products</a><br>
+                    <a class="footer-link" href="{{ url_for('products', category='Heels') }}">Heels</a><br>
+                    <a class="footer-link" href="{{ url_for('products', category='Flats') }}">Flats</a>
+                </div>
+                <div class="col-md-3">
+                    <h6 class="footer-title">Company</h6>
+                    <a class="footer-link" href="{{ url_for('about') }}">About</a><br>
+                    <a class="footer-link" href="{{ url_for('contact') }}">Contact</a>
+                </div>
+                <div class="col-md-3">
+                    <h6 class="footer-title">Support</h6>
+                    <a class="footer-link" href="{{ url_for('my_orders') }}">My Orders</a><br>
+                    <a class="footer-link" href="{{ url_for('wishlist') }}">Wishlist</a><br>
+                    <a class="footer-link" href="{{ url_for('cart') }}">Cart</a>
+                </div>
+            </div>
+            <div class="pt-4 mt-4 border-top border-secondary text-center text-light-emphasis small">
+                © 2026 QUICKDECK. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

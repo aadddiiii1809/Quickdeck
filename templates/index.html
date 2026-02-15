@@ -1,0 +1,368 @@
+{% extends "base.html" %}
+
+{% block title %}QUICKDECK | Premium Footwear Store{% endblock %}
+
+{% block content %}
+<section class="hero-slider-wrap">
+    <div id="homeHeroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            {% for b in hero_banners %}
+            <button type="button" data-bs-target="#homeHeroCarousel" data-bs-slide-to="{{ loop.index0 }}" class="{% if loop.first %}active{% endif %}"></button>
+            {% endfor %}
+        </div>
+        <div class="carousel-inner">
+            {% for b in hero_banners %}
+            <div class="carousel-item {% if loop.first %}active{% endif %}" data-bs-interval="4500">
+                <div class="hero-slide" style="background-image:linear-gradient(to right, rgba(2,6,23,.62), rgba(2,6,23,.2)), url('{{ b.image }}');">
+                    <div class="container h-100 d-flex align-items-center">
+                        <div class="hero-content">
+                            <p class="hero-kicker">New Drop</p>
+                            <h1 class="hero-title serif">{{ b.title }}</h1>
+                            <p class="hero-text">{{ b.subtitle }}</p>
+                            <a href="{{ b.link }}" class="btn btn-brand px-4 py-2">Shop Now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#homeHeroCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#homeHeroCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+        </button>
+    </div>
+</section>
+
+<section class="round-category-wrap py-4 border-bottom">
+    <div class="container">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h2 class="serif mb-0 fs-2">Shop By Category</h2>
+            <a href="{{ url_for('products') }}" class="text-dark fw-bold text-decoration-none small">VIEW ALL</a>
+        </div>
+        <div class="category-round-row">
+            {% for c in round_categories %}
+            <a href="{{ url_for('products', category=c.name) }}" class="round-category-item text-decoration-none">
+                <div class="round-category-image">
+                    <img src="{{ c.image }}" alt="{{ c.name }}">
+                </div>
+                <span>{{ c.name }}</span>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="py-4">
+    <div class="container">
+        <div class="row g-3">
+            {% for b in promo_banners %}
+            <div class="col-md-4">
+                <a href="{{ b.link }}" class="promo-banner text-decoration-none">
+                    <img src="{{ b.image }}" alt="{{ b.title }}">
+                    <div class="promo-overlay">
+                        <h4 class="serif">{{ b.title }}</h4>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="py-4 collection-block-bg">
+    <div class="container">
+        <div class="women-collage-grid">
+            <a href="{{ women_collage.large.link }}" class="collage-card collage-large text-decoration-none">
+                <img src="{{ women_collage.large.image }}" alt="{{ women_collage.large.name }}">
+                <span>{{ women_collage.large.name }}</span>
+            </a>
+            {% for item in women_collage.tiles %}
+            <a href="{{ item.link }}" class="collage-card collage-small text-decoration-none">
+                <img src="{{ item.image }}" alt="{{ item.name }}">
+                <span>{{ item.name }}</span>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="py-4 collection-block-bg">
+    <div class="container">
+        <div class="row g-4">
+            {% for item in women_collection_tiles %}
+            <div class="col-6 col-md-3">
+                <a href="{{ item.link }}" class="collection-tile-card text-decoration-none">
+                    <img src="{{ item.image }}" alt="{{ item.name }}">
+                    <span>{{ item.name }}</span>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="py-4 collection-block-bg">
+    <div class="container">
+        <h2 class="serif text-center mb-4">Shop By Collection Men</h2>
+        <div class="row g-4">
+            {% for item in men_collection_tiles %}
+            <div class="col-6 col-md-3">
+                <a href="{{ item.link }}" class="collection-tile-card text-decoration-none">
+                    <img src="{{ item.image }}" alt="{{ item.name }}">
+                    <span>{{ item.name }}</span>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="section-head d-flex justify-content-between align-items-center mb-4">
+            <h2 class="serif mb-0">Featured Collection</h2>
+            <a href="{{ url_for('products') }}" class="text-dark fw-bold text-decoration-none small">BROWSE ALL</a>
+        </div>
+        <div class="row g-4">
+            {% for product in featured_products %}
+            {% set sale_price = product.get('meesho_price') or product.get('price') or 0 %}
+            {% set mrp = product.get('mrp') or sale_price %}
+            {% set img = product.get('image_1') or url_for('static', filename='images/default-product.jpg') %}
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="store-card h-100">
+                    <a href="{{ url_for('product_detail', product_id=product._id|string) }}" class="text-decoration-none">
+                        <div class="store-img-wrap">
+                            <img src="{{ img }}" alt="{{ product.get('product_name', 'Product') }}">
+                            {% if mrp > sale_price %}
+                            <span class="sale-badge">{{ (((mrp - sale_price) / mrp) * 100)|int }}% OFF</span>
+                            {% endif %}
+                        </div>
+                        <div class="p-3">
+                            <p class="small text-muted mb-1">{{ product.get('category', 'Footwear') }}</p>
+                            <h6 class="text-dark mb-2 product-title">{{ product.get('product_name', 'Unnamed Product') }}</h6>
+                            <div class="d-flex align-items-center gap-2">
+                                <strong>Rs {{ sale_price|round|int }}</strong>
+                                {% if mrp > sale_price %}
+                                <span class="text-muted text-decoration-line-through small">Rs {{ mrp|round|int }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="mid-banner">
+            <img src="https://images.unsplash.com/photo-1460353581641-37baddab0fa2?auto=format&fit=crop&w=1800&q=80" alt="Mid banner">
+            <div class="mid-banner-overlay text-center">
+                <h2 class="serif">Festive Footwear Edit</h2>
+                <p>Elegant styles for wedding season and celebrations.</p>
+                <a href="{{ url_for('products', category='Festive') }}" class="btn btn-brand px-4 py-2">Explore Collection</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.hero-slide {
+    height: 560px;
+    background-size: cover;
+    background-position: center;
+    color: #fff;
+}
+.hero-content {
+    max-width: 560px;
+}
+.hero-kicker {
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    font-weight: 700;
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+.hero-title {
+    font-size: clamp(2rem, 6vw, 4.3rem);
+    line-height: 1;
+}
+.hero-text {
+    color: rgba(255,255,255,.88);
+    margin-bottom: 24px;
+}
+
+.category-round-row {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+}
+.round-category-item {
+    min-width: 110px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    color: #0f172a;
+    font-weight: 700;
+    font-size: 13px;
+}
+.round-category-image {
+    width: 96px;
+    height: 96px;
+    border-radius: 999px;
+    overflow: hidden;
+    border: 2px solid #e2e8f0;
+}
+.round-category-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.promo-banner {
+    display: block;
+    position: relative;
+    height: 230px;
+    border-radius: 14px;
+    overflow: hidden;
+}
+.promo-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.promo-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(15,23,42,.75), rgba(15,23,42,.15));
+    display: flex;
+    align-items: flex-end;
+    padding: 18px;
+}
+.promo-overlay h4 {
+    color: #fff;
+    margin: 0;
+}
+
+.collection-block-bg {
+    background: #f1f1f1;
+}
+
+.women-collage-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 20px;
+}
+
+.collage-card {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    background: #fff;
+}
+
+.collage-large {
+    grid-row: span 2;
+    min-height: 620px;
+}
+
+.collage-small {
+    min-height: 300px;
+}
+
+.collage-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.collage-card span,
+.collection-tile-card span {
+    position: absolute;
+    left: 14px;
+    bottom: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #111827;
+    font-size: 22px;
+    text-shadow: 0 1px 0 rgba(255,255,255,.35);
+}
+
+.collection-tile-card {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    min-height: 300px;
+    background: #fff;
+}
+
+.collection-tile-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.collection-tile-card span {
+    font-size: 18px;
+}
+
+.store-card { background:#fff; border:1px solid #e5e7eb; border-radius:12px; overflow:hidden; transition:.25s ease; }
+.store-card:hover { transform: translateY(-4px); box-shadow: 0 16px 24px rgba(0,0,0,.08); }
+.store-img-wrap { position: relative; background: #f8fafc; aspect-ratio: 3/4; display:flex; align-items:center; justify-content:center; }
+.store-img-wrap img { width: 100%; height: 100%; object-fit: contain; padding: 18px; }
+.sale-badge { position: absolute; top: 10px; right: 10px; background: #ef4444; color: #fff; font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 999px; }
+.product-title { font-size: 14px; min-height: 34px; }
+
+.mid-banner {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    height: 380px;
+}
+.mid-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.mid-banner-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(2,6,23,.6), rgba(2,6,23,.15));
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 20px;
+}
+
+@media (max-width: 768px) {
+    .hero-slide { height: 460px; }
+    .round-category-image { width: 80px; height: 80px; }
+    .round-category-item { min-width: 90px; font-size: 12px; }
+    .women-collage-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    .collage-large {
+        grid-column: span 2;
+        min-height: 320px;
+    }
+    .collage-small,
+    .collection-tile-card {
+        min-height: 220px;
+    }
+    .collage-card span,
+    .collection-tile-card span {
+        font-size: 15px;
+    }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block admin_content %}
+<div class="container-fluid">
+    <h1>QUICKDECK Admin Dashboard</h1>
+    <p>Dashboard loaded successfully!</p>
+    <div class="row">
+        <div class="col-md-3"><div class="card"><div class="card-body"><h5>Products</h5><h2>{{ total_products }}</h2></div></div></div>
+        <div class="col-md-3"><div class="card"><div class="card-body"><h5>Orders</h5><h2>{{ total_orders }}</h2></div></div></div>
+        <div class="col-md-3"><div class="card"><div class="card-body"><h5>Customers</h5><h2>{{ total_customers }}</h2></div></div></div>
+        <div class="col-md-3"><div class="card"><div class="card-body"><h5>Pending</h5><h2>{{ pending_orders }}</h2></div></div></div>
+    </div>
+</div>
+{% endblock %}

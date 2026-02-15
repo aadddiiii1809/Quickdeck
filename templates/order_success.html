@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Order Success - QUICKDECK{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4 p-lg-5">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-check-circle text-success" style="font-size:56px;"></i>
+                            <h2 class="mt-3 mb-1">Order Placed Successfully</h2>
+                            <p class="text-muted mb-0">Thank you for shopping with QUICKDECK.</p>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4"><div class="border rounded p-3"><small class="text-muted d-block">Order ID</small><strong>#{{ order._id }}</strong></div></div>
+                            <div class="col-md-4"><div class="border rounded p-3"><small class="text-muted d-block">Order Date</small><strong>{{ order.order_date.strftime('%d %b %Y') if order.get('order_date') else 'N/A' }}</strong></div></div>
+                            <div class="col-md-4"><div class="border rounded p-3"><small class="text-muted d-block">Total</small><strong>Rs {{ order.total_amount|round|int }}</strong></div></div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h5 class="mb-2">Payment & Delivery</h5>
+                            <p class="mb-1"><strong>Payment:</strong> {{ order.get('payment_method', 'cod')|upper }} / {{ order.get('payment_status', 'Pending') }}</p>
+                            <p class="mb-1"><strong>Status:</strong> {{ order.get('status', 'Pending') }}</p>
+                            <p class="mb-0"><strong>Address:</strong> {{ order.get('delivery_address', '') }}</p>
+                        </div>
+
+                        <div class="mb-4">
+                            <h5 class="mb-3">Order Items</h5>
+                            {% for item in order.get('products', []) %}
+                            <div class="d-flex justify-content-between border-bottom py-2">
+                                <span>{{ item.get('name', 'Item') }} x {{ item.get('quantity', 1) }}</span>
+                                <strong>Rs {{ item.get('subtotal', 0)|round|int }}</strong>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2">
+                            <a href="{{ url_for('download_invoice', order_id=order._id|string) }}" class="btn btn-dark">
+                                <i class="fas fa-file-invoice me-2"></i>Download Invoice
+                            </a>
+                            <a href="{{ url_for('my_orders') }}" class="btn btn-outline-dark">
+                                <i class="fas fa-box me-2"></i>My Orders
+                            </a>
+                            <a href="{{ url_for('products') }}" class="btn btn-brand">
+                                <i class="fas fa-shopping-bag me-2"></i>Continue Shopping
+                            </a>
+                            <a href="{{ url_for('index') }}" class="btn btn-brand-outline">
+                                <i class="fas fa-home me-2"></i>Go Home
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

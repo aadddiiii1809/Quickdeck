@@ -1,0 +1,161 @@
+Build a complete E-commerce Website for my company QUICKDECK, using the details from our business card. QUICKDECK is an E-commerce Partner and sells all types of ladies footwear in retail. Our products are also available on Amazon and Flipkart, so include their logos and references on the website.
+
+QUICKDECK BUSINESS DETAILS TO INCLUDE
+
+Company Name: QUICKDECK
+
+Tagline: Your Gateway to Global Retail
+
+Business Type: E-commerce Partner
+
+Address: Vasant Nagar, G-70/2, Thakkar Bappa Colony, Near Gopal Hotel, Chembur, Mumbai, Maharashtra, 400071
+
+Contact: 8097130846 / 9619328102
+
+1. Build an Attractive, Animated Homepage
+
+Visually appealing, modern design
+
+Include the QUICKDECK brand colors (blue/white like the visiting card)
+
+Animated product banners
+
+Hover effects, smooth slide transitions
+
+Icons similar to the visiting card (gifts, shoes, cart, delivery truck, phone, bags, etc.)
+
+Add Amazon and Flipkart logos in a “Available On” section
+
+Navigation: Home | Products | Categories | About Us | Contact | Login / Signup
+
+2. Build the Full Website
+Pages Required:
+
+Home Page
+
+Products Page (all ladies footwear)
+
+Categories Page (heels, sneakers, sandals, flats, slip-ons, etc.)
+
+Product Details Page
+
+About QUICKDECK (use company details above)
+
+Contact Page (include address + phone numbers)
+
+Login Page
+
+Signup Page
+
+Cart Page
+
+Checkout Page
+
+Order Success Page
+
+Ensure full mobile responsiveness.
+
+3. Create a Login & Signup System
+
+User registration with: Name, Email, Phone, Address, Password
+
+Secure password hashing
+
+Session or JWT authentication
+
+User must log in to place an order
+
+4. Backend + Database Setup
+
+Use Python (flask) + MongoDB.
+
+Create these collections:
+
+Users → name, email, phone, address, passwordHash
+
+Products → name, price, category, size, description, images, stock
+
+Orders → userID, products, amount, date, address
+
+Cart → userID, productID, quantity
+
+5. Admin Panel for QUICKDECK
+
+Owner/Admin can:
+
+Add new footwear products
+
+Edit/update products
+
+Delete products
+
+Upload product images
+
+Manage stock
+
+View all customer orders
+
+Mark orders as shipped/delivered
+
+Provide a secure admin login.
+
+6. Allow Product Editing
+
+Give me:
+
+A backend API to update products
+
+A simple admin UI form to modify product details
+
+A clean product JSON format I can manually edit anytime
+
+7. Cart + Checkout System
+
+Add to cart
+
+Remove from cart
+
+Update quantity
+
+Checkout page with address & contact
+
+Order summary
+
+Order confirmation page
+
+8. Styling & UI Requirements
+
+Use colors matching the visiting card (Blue gradient, white icons)
+
+Add icons similar to the visiting card background (shoes, heels, carts, delivery truck, gifts, credit card, etc.)
+
+Smooth UI/UX transitions
+
+High-quality card-style product displays
+
+Animated buttons & banners
+
+9. Show Amazon & Flipkart Availability
+
+Add a section:
+“Our Products Are Also Available On”
+with Amazon + Flipkart icons like on the visiting card.
+
+10. Final Delivery Requirements
+
+Provide:
+
+Full source code
+
+Backend and frontend folder structure
+
+Installation + run instructions
+
+Database setup details
+
+Sample product data
+
+Easily editable code for future updates
+
+
+

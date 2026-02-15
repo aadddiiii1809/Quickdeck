@@ -1,0 +1,161 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Order Logistics - QUICKDECK Admin{% endblock %}
+{% block page_title %}Order Logistics{% endblock %}
+{% block page_subtitle %}Search, filter and process orders quickly{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="kpi-card">
+            <div class="kpi-value">{{ total_orders }}</div>
+            <div class="kpi-label">Orders (Filtered)</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="kpi-card">
+            <div class="kpi-value">{{ pending_count }}</div>
+            <div class="kpi-label">Pending</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="kpi-card">
+            <div class="kpi-value">{{ shipped_count }}</div>
+            <div class="kpi-label">Shipped</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="kpi-card">
+            <div class="kpi-value">{{ delivered_count }}</div>
+            <div class="kpi-label">Delivered</div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-2">
+            <div class="col-md-4">
+                <input type="text" class="form-control" name="q" value="{{ query_text }}" placeholder="Search order id / customer / status">
+            </div>
+            <div class="col-md-2">
+                <select class="form-select" name="status">
+                    <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Status</option>
+                    <option value="Pending" {% if status_filter == 'Pending' %}selected{% endif %}>Pending</option>
+                    <option value="Processing" {% if status_filter == 'Processing' %}selected{% endif %}>Processing</option>
+                    <option value="Shipped" {% if status_filter == 'Shipped' %}selected{% endif %}>Shipped</option>
+                    <option value="Delivered" {% if status_filter == 'Delivered' %}selected{% endif %}>Delivered</option>
+                    <option value="Cancelled" {% if status_filter == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input type="date" class="form-control" name="date_from" value="{{ date_from }}">
+            </div>
+            <div class="col-md-2">
+                <input type="date" class="form-control" name="date_to" value="{{ date_to }}">
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button class="btn btn-primary w-100" type="submit">Apply</button>
+                <a href="{{ url_for('admin_orders') }}" class="btn btn-outline-secondary">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">All Orders</h5>
+        <small class="text-muted">{{ orders|length }} records</small>
+    </div>
+    <div class="card-body">
+        {% if orders and orders|length > 0 %}
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>#{{ order._id|string|truncate(10, True, '') }}</td>
+                        <td>{{ order.get('user_name') or order.get('customer_name') or 'Customer' }}</td>
+                        <td>
+                            {% if order.get('created_at') %}
+                                {{ order.get('created_at').strftime('%d %b %Y, %I:%M %p') }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td>Rs {{ order.get('total_amount', 0)|round|int }}</td>
+                        <td>
+                            <select class="form-select form-select-sm order-status-select" data-order-id="{{ order._id }}" style="min-width:130px;">
+                                <option value="Pending" {% if order.get('status') == 'Pending' %}selected{% endif %}>Pending</option>
+                                <option value="Processing" {% if order.get('status') == 'Processing' %}selected{% endif %}>Processing</option>
+                                <option value="Shipped" {% if order.get('status') == 'Shipped' %}selected{% endif %}>Shipped</option>
+                                <option value="Delivered" {% if order.get('status') == 'Delivered' %}selected{% endif %}>Delivered</option>
+                                <option value="Cancelled" {% if order.get('status') == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                            </select>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('admin_orders', q=order._id|string) }}" class="btn btn-sm btn-outline-primary">Open</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5 text-muted">No orders found for current filters.</div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.kpi-card {
+    background:#fff;
+    border:1px solid #e2e8f0;
+    border-radius:12px;
+    padding:16px;
+}
+.kpi-value {
+    font-size:30px;
+    line-height:1;
+    font-weight:700;
+    color:#1e293b;
+}
+.kpi-label {
+    margin-top:6px;
+    color:#64748b;
+    font-size:13px;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.order-status-select').forEach(function(select) {
+        select.addEventListener('change', function() {
+            const formData = new FormData();
+            formData.append('status', this.value);
+            fetch(`/admin/order/update_status/${this.dataset.orderId}`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (!data.success) alert('Status update failed');
+            })
+            .catch(() => alert('Status update failed'));
+        });
+    });
+});
+</script>
+{% endblock %}

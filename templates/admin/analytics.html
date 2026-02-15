@@ -1,0 +1,71 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Analytics - QUICKDECK Admin{% endblock %}
+{% block page_title %}Analytics{% endblock %}
+{% block page_subtitle %}Revenue, fulfillment and trend insights{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-3"><div class="metric"><h3>{{ total_orders }}</h3><p>Total Orders</p></div></div>
+    <div class="col-md-3"><div class="metric"><h3>{{ delivered_orders }}</h3><p>Delivered</p></div></div>
+    <div class="col-md-3"><div class="metric"><h3>{{ cancelled_orders }}</h3><p>Cancelled</p></div></div>
+    <div class="col-md-3"><div class="metric"><h3>Rs {{ avg_order_value|round|int }}</h3><p>Avg Order Value</p></div></div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header"><h5 class="mb-0">Monthly Revenue vs Orders (Last 6 Months)</h5></div>
+    <div class="card-body">
+        <canvas id="monthlyChart" height="120"></canvas>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><h5 class="mb-0">Monthly Summary</h5></div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table">
+                <thead><tr><th>Month</th><th>Orders</th><th>Revenue</th></tr></thead>
+                <tbody>
+                    {% for row in monthly_rows %}
+                    <tr>
+                        <td>{{ row._id }}</td>
+                        <td>{{ row.orders }}</td>
+                        <td>Rs {{ row.revenue|round|int }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="3" class="text-center text-muted">No analytics data available.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+.metric { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:16px; }
+.metric h3 { margin:0; font-size:28px; }
+.metric p { margin:6px 0 0; color:#64748b; }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const monthlyRows = {{ monthly_rows|tojson }};
+const labels = monthlyRows.map(r => r._id);
+const orders = monthlyRows.map(r => r.orders || 0);
+const revenue = monthlyRows.map(r => r.revenue || 0);
+const ctx = document.getElementById('monthlyChart');
+if (ctx) {
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [
+                { label: 'Orders', data: orders, backgroundColor: 'rgba(59,130,246,0.6)' },
+                { label: 'Revenue', data: revenue, backgroundColor: 'rgba(16,185,129,0.6)' }
+            ]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+}
+</script>
+{% endblock %}

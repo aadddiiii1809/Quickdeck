@@ -1,0 +1,43 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Bulk Upload - QUICKDECK Admin{% endblock %}
+{% block page_title %}Bulk Upload{% endblock %}
+{% block page_subtitle %}Upload multiple listings at once with mandatory attributes.{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active">Bulk Upload</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="mb-3"><i class="fas fa-file-upload me-2"></i>Upload CSV or XLSX</h5>
+            <form method="POST" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">File</label>
+                    <input type="file" name="file" class="form-control" accept=".csv,.xlsx" required>
+                    <div class="form-text">Only `.csv` and `.xlsx` are allowed.</div>
+                </div>
+                <button type="submit" class="btn btn-admin btn-admin-primary">
+                    <i class="fas fa-upload me-2"></i>Start Upload
+                </button>
+                <a href="{{ url_for('admin_products') }}" class="btn btn-admin btn-admin-outline ms-2">Back to Products</a>
+            </form>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5 class="mb-3"><i class="fas fa-list-check me-2"></i>Mandatory Attributes</h5>
+            <div class="row">
+                {% for attr in required_attributes %}
+                <div class="col-md-4 mb-2">
+                    <span class="badge bg-light text-dark border">{{ attr }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

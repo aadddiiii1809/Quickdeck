@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.get('product_name', 'Product') }} | QUICKDECK{% endblock %}
+
+{% block content %}
+{% set sale_price = product.get('meesho_price') or product.get('price') or 0 %}
+{% set mrp = product.get('mrp') or sale_price %}
+{% set gallery = product.get('display_images') if product.get('display_images') else [url_for('static', filename='images/default-product.jpg')] %}
+{% set primary_img = gallery[0] %}
+{% set size_list = product.get('display_sizes') if product.get('display_sizes') else [] %}
+<section class="py-5">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-6">
+                <div class="detail-main-image mb-3">
+                    <img id="mainImage" src="{{ primary_img }}" alt="{{ product.get('product_name', 'Product') }}" loading="eager" decoding="async">
+                </div>
+                <div class="row g-2">
+                    {% for img in gallery %}
+                    <div class="col-3">
+                        <button type="button" class="thumb-btn" onclick="changeImage('{{ img }}')">
+                            <img src="{{ img }}" alt="Thumbnail" loading="lazy" decoding="async">
+                        </button>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <span class="text-uppercase small text-muted">{{ product.get('category', 'Footwear') }}</span>
+                <h1 class="serif mb-2">{{ product.get('product_name', 'Unnamed Product') }}</h1>
+                <div class="mb-2 text-muted small">
+                    <i class="fas fa-star text-warning"></i> {{ avg_rating }} ({{ rating_count }} reviews)
+                </div>
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <strong class="fs-3">Rs {{ sale_price|round|int }}</strong>
+                    {% if mrp > sale_price %}
+                    <span class="text-muted text-decoration-line-through">Rs {{ mrp|round|int }}</span>
+                    <span class="badge text-bg-danger">{{ (((mrp - sale_price) / mrp) * 100)|int }}% OFF</span>
+                    {% endif %}
+                </div>
+                <p class="text-muted mb-4">{{ product.get('description', 'Premium quality footwear crafted for comfort and style.') }}</p>
+
+                <form action="{{ url_for('add_to_cart', product_id=product._id|string) }}" method="POST" class="card p-3 mb-4">
+                    {% if size_list %}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Select Size</label>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for s in size_list %}
+                            <input type="radio" class="btn-check" name="selected_size" id="size{{ loop.index }}" value="{{ s }}" required>
+                            <label class="btn btn-outline-dark btn-sm" for="size{{ loop.index }}">{{ s }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="row g-2">
+                        <div class="col-4">
+                            <label class="form-label small">Qty</label>
+                            <input class="form-control" type="number" name="quantity" value="1" min="1" max="{{ product.get('inventory', 1) }}">
+                        </div>
+                        <div class="col-8 d-flex align-items-end">
+                            <button type="submit" class="btn btn-brand w-100 py-2"><i class="fas fa-bag-shopping me-2"></i>Add To Cart</button>
+                        </div>
+                    </div>
+                </form>
+                {% if session.get('user_id') %}
+                <button id="wishlistBtn" class="btn btn-brand-outline mb-3" data-product-id="{{ product._id|string }}">
+                    <i class="fas fa-heart me-2"></i>{{ 'Remove from Wishlist' if in_wishlist else 'Add to Wishlist' }}
+                </button>
+                {% endif %}
+
+                <div class="detail-points">
+                    <div><i class="fas fa-truck-fast"></i> Free shipping on prepaid orders</div>
+                    <div><i class="fas fa-rotate-left"></i> Easy returns on eligible products</div>
+                    <div><i class="fas fa-certificate"></i> Trusted quality checks</div>
+                </div>
+            </div>
+        </div>
+
+        {% if related_products and related_products|length > 0 %}
+        <div class="mt-5 pt-5 border-top">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="serif mb-0">You May Also Like</h3>
+                <a href="{{ url_for('products') }}" class="text-decoration-none fw-bold text-dark small">VIEW ALL</a>
+            </div>
+            <div class="row g-4">
+                {% for related in related_products %}
+                {% set r_price = related.get('meesho_price') or related.get('price') or 0 %}
+                {% set r_mrp = related.get('mrp') or r_price %}
+                {% set r_img = related.get('display_image') or url_for('static', filename='images/default-product.jpg') %}
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="store-card h-100">
+                        <a href="{{ url_for('product_detail', product_id=related._id|string) }}" class="text-decoration-none">
+                            <div class="store-img-wrap">
+                                <img src="{{ r_img }}" alt="Related product" loading="lazy" decoding="async">
+                            </div>
+                            <div class="p-3">
+                                <p class="small text-muted mb-1">{{ related.get('category', 'Footwear') }}</p>
+                                <h6 class="text-dark mb-2 product-title">{{ related.get('product_name', 'Product') }}</h6>
+                                <div class="d-flex align-items-center gap-2">
+                                    <strong>Rs {{ r_price|round|int }}</strong>
+                                    {% if r_mrp > r_price %}
+                                    <span class="text-muted text-decoration-line-through small">Rs {{ r_mrp|round|int }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="mt-5 pt-4 border-top">
+            <h3 class="serif mb-3">Customer Reviews</h3>
+            {% if session.get('user_id') %}
+            <form action="{{ url_for('add_review', product_id=product._id|string) }}" method="POST" class="card p-3 mb-4">
+                <div class="row g-2">
+                    <div class="col-md-2">
+                        <select name="rating" class="form-select" required>
+                            <option value="5">5 Star</option>
+                            <option value="4">4 Star</option>
+                            <option value="3">3 Star</option>
+                            <option value="2">2 Star</option>
+                            <option value="1">1 Star</option>
+                        </select>
+                    </div>
+                    <div class="col-md-8">
+                        <input type="text" name="comment" class="form-control" placeholder="Write your review">
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-brand w-100" type="submit">Submit</button>
+                    </div>
+                </div>
+            </form>
+            {% endif %}
+
+            {% for r in product_reviews %}
+            <div class="border rounded p-3 mb-2">
+                <div class="d-flex justify-content-between">
+                    <strong>{{ r.get('user_name', 'User') }}</strong>
+                    <span class="text-warning">{{ '★' * (r.get('rating', 0)|int) }}</span>
+                </div>
+                <p class="mb-0 mt-2">{{ r.get('comment', '') }}</p>
+            </div>
+            {% else %}
+            <p class="text-muted">No reviews yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<style>
+.detail-main-image { background:#f8fafc; border:1px solid #e5e7eb; border-radius:12px; aspect-ratio: 4/5; display:flex; align-items:center; justify-content:center; }
+.detail-main-image img { width:100%; height:100%; object-fit:contain; padding:20px; }
+.thumb-btn { border:1px solid #e5e7eb; background:#fff; width:100%; border-radius:8px; padding:4px; }
+.thumb-btn img { width:100%; height:70px; object-fit:contain; }
+.detail-points div { font-size:14px; margin-bottom:8px; color:#334155; }
+.detail-points i { color:#9a5f35; margin-right:8px; }
+.store-card { background:#fff; border:1px solid #e5e7eb; border-radius:12px; overflow:hidden; transition:.25s ease; }
+.store-card:hover { transform: translateY(-4px); box-shadow: 0 16px 24px rgba(0,0,0,.08); }
+.store-img-wrap { background:#f8fafc; aspect-ratio:3/4; display:flex; align-items:center; justify-content:center; }
+.store-img-wrap img { width:100%; height:100%; object-fit:contain; padding:18px; }
+.product-title { font-size:14px; min-height:34px; }
+</style>
+
+<script>
+function changeImage(src) {
+    const el = document.getElementById('mainImage');
+    if (el) el.src = src;
+}
+
+const wishlistBtn = document.getElementById('wishlistBtn');
+if (wishlistBtn) {
+    wishlistBtn.addEventListener('click', function() {
+        const productId = this.dataset.productId;
+        const remove = this.textContent.toLowerCase().includes('remove');
+        const url = remove ? `/wishlist/remove/${productId}` : `/wishlist/add/${productId}`;
+        fetch(url, { method: 'POST' })
+            .then(r => r.json())
+            .then(data => {
+                if (!data.success) return;
+                this.innerHTML = remove
+                    ? '<i class="fas fa-heart me-2"></i>Add to Wishlist'
+                    : '<i class="fas fa-heart me-2"></i>Remove from Wishlist';
+            });
+    });
+}
+</script>
+{% endblock %}

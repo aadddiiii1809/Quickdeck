@@ -1,0 +1,129 @@
+:root {
+    /* Refined Color Palette */
+    --primary-blue: #0066cc;
+    --secondary-blue: #004080;
+    --light-blue: #3399ff;
+    --gradient-start: #0066cc;
+    --gradient-end: #003d7a;
+    --white: #ffffff;
+    --light-gray: #f4f7f6; /* Softer background */
+    --dark-gray: #2d3436;
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    --card-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+}
+
+/* 1. Global & Typography Updates */
+body {
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: var(--dark-gray);
+    background-color: var(--light-gray);
+    line-height: 1.6;
+}
+
+/* 2. Glassmorphism Navbar */
+.navbar {
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 0.8rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.brand-name {
+    background: linear-gradient(45deg, var(--primary-blue), var(--secondary-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+
+.nav-link {
+    color: var(--secondary-blue) !important;
+    font-weight: 500;
+    padding: 0.5rem 1.2rem !important;
+}
+
+/* 3. Hero Section Enhancements */
+.hero-section {
+    background: var(--primary-gradient);
+    background-image: radial-gradient(circle at 20% 30%, rgba(51, 153, 255, 0.2) 0%, transparent 50%),
+                      linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+    clip-path: ellipse(150% 100% at 50% 0%); /* Modern curved bottom */
+    padding: 100px 0;
+}
+
+.hero-title {
+    font-size: clamp(2.5rem, 8vw, 4.5rem); /* Responsive scaling */
+    line-height: 1.1;
+    text-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+/* 4. Interactive Product Cards */
+.product-card {
+    border: none;
+    border-radius: 20px;
+    background: var(--white);
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: var(--card-shadow);
+}
+
+.product-card:hover {
+    transform: translateY(-15px);
+    box-shadow: 0 25px 50px rgba(0, 102, 204, 0.15);
+}
+
+.product-image {
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.product-card:hover .product-image {
+    transform: scale(1.15) rotate(-2deg); /* Dynamic shoe display */
+}
+
+/* 5. Modern Buttons */
+.btn-primary {
+    background: var(--primary-blue);
+    border: none;
+    padding: 0.8rem 2rem;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
+}
+
+.btn-primary:hover {
+    background: var(--secondary-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 102, 204, 0.4);
+}
+
+/* 6. Advanced Floating Animation */
+@keyframes float {
+    0% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-30px) rotate(5deg); }
+    100% { transform: translateY(0px) rotate(0deg); }
+}
+
+.icon-float {
+    animation: float 8s ease-in-out infinite;
+    filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2));
+}
+
+/* 7. Product Detail & Sizes */
+.size-badge {
+    cursor: pointer;
+    background: var(--white);
+    border: 2px solid var(--light-gray);
+    padding: 0.7rem 1.2rem;
+    border-radius: 12px;
+    transition: 0.2s;
+}
+
+.size-badge:hover, .size-badge.active {
+    border-color: var(--primary-blue);
+    color: var(--primary-blue);
+    background: rgba(0, 102, 204, 0.05);
+}

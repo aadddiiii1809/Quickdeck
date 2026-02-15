@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Shop Collection | QUICKDECK{% endblock %}
+
+{% block content %}
+<section class="py-4 border-bottom bg-light">
+    <div class="container">
+        <h2 class="serif mb-1">Product Collection</h2>
+        <p class="text-muted mb-0">Browse premium footwear with smart filters and sorting.</p>
+    </div>
+</section>
+
+<section class="py-4">
+    <div class="container">
+        <form method="GET" class="filter-bar card p-3 mb-4">
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <input type="text" name="q" class="form-control" placeholder="Search product" value="{{ query_text }}">
+                </div>
+                <div class="col-md-2">
+                    <select name="category" class="form-select">
+                        <option value="">All Categories</option>
+                        {% for c in categories %}
+                        <option value="{{ c }}" {% if c == selected_category %}selected{% endif %}>{{ c }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="material" class="form-select">
+                        <option value="">All Materials</option>
+                        {% for m in materials %}
+                        <option value="{{ m }}" {% if m == selected_material %}selected{% endif %}>{{ m }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="sort" class="form-select">
+                        <option value="latest" {% if sort_by == 'latest' %}selected{% endif %}>Latest</option>
+                        <option value="price_low" {% if sort_by == 'price_low' %}selected{% endif %}>Price Low-High</option>
+                        <option value="price_high" {% if sort_by == 'price_high' %}selected{% endif %}>Price High-Low</option>
+                        <option value="name_asc" {% if sort_by == 'name_asc' %}selected{% endif %}>Name A-Z</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex gap-2">
+                    <button class="btn btn-brand w-100" type="submit">Apply</button>
+                    <a href="{{ url_for('products') }}" class="btn btn-brand-outline">Reset</a>
+                </div>
+            </div>
+        </form>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">{{ products|length }} Products</h5>
+        </div>
+
+        <div class="row g-4">
+            {% for product in products %}
+            {% set sale_price = product.get('meesho_price') or product.get('price') or 0 %}
+            {% set mrp = product.get('mrp') or sale_price %}
+            {% set img = product.get('display_image') or url_for('static', filename='images/default-product.jpg') %}
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="store-card h-100">
+                    <a href="{{ url_for('product_detail', product_id=product._id|string) }}" class="text-decoration-none">
+                        <div class="store-img-wrap">
+                            <img src="{{ img }}" alt="{{ product.get('product_name', 'Product') }}" loading="lazy" decoding="async">
+                            {% if mrp > sale_price %}
+                            <span class="sale-badge">{{ (((mrp - sale_price) / mrp) * 100)|int }}% OFF</span>
+                            {% endif %}
+                        </div>
+                        <div class="p-3">
+                            <p class="small text-muted mb-1">{{ product.get('category', 'Footwear') }}</p>
+                            <h6 class="text-dark mb-2 product-title">{{ product.get('product_name', 'Unnamed Product') }}</h6>
+                            <div class="d-flex align-items-center gap-2">
+                                <strong>Rs {{ sale_price|round|int }}</strong>
+                                {% if mrp > sale_price %}
+                                <span class="text-muted text-decoration-line-through small">Rs {{ mrp|round|int }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-12 text-center py-5">
+                <h4>No products found</h4>
+                <p class="text-muted">Try changing filters or search text.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<style>
+.filter-bar { border: 1px solid #e5e7eb; border-radius: 12px; }
+.store-card { background:#fff; border:1px solid #e5e7eb; border-radius:12px; overflow:hidden; transition:.25s ease; }
+.store-card:hover { transform: translateY(-4px); box-shadow: 0 16px 24px rgba(0,0,0,.08); }
+.store-img-wrap { position: relative; background: #f8fafc; aspect-ratio: 3/4; display:flex; align-items:center; justify-content:center; }
+.store-img-wrap img { width: 100%; height: 100%; object-fit: contain; padding: 18px; }
+.sale-badge { position: absolute; top: 10px; right: 10px; background: #ef4444; color: #fff; font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 999px; }
+.product-title { font-size: 14px; min-height: 34px; }
+</style>
+{% endblock %}

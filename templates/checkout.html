@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout - QUICKDECK{% endblock %}
+
+{% block content %}
+<section class="py-4 border-bottom bg-light">
+    <div class="container">
+        <h1 class="serif mb-1">Checkout</h1>
+        <p class="text-muted mb-0">Complete your delivery details and place order.</p>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="mb-3">Delivery Information</h5>
+                        <form id="checkoutForm">
+                            <div class="mb-3">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" class="form-control" value="{{ user.get('name', '') }}" required>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" value="{{ user.get('email', '') }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Phone</label>
+                                    <input type="tel" class="form-control" id="phone" value="{{ user.get('phone', '') }}" required>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <label class="form-label">Address</label>
+                                <textarea class="form-control" id="address" rows="3" required>{{ user.get('address', '') }}</textarea>
+                            </div>
+                            <div class="mt-3">
+                                <label class="form-label">Pincode</label>
+                                <input type="text" class="form-control" id="pincode" value="{{ user.get('pincode', '') }}" required>
+                            </div>
+                            <div class="mt-3">
+                                <label class="form-label">Payment</label>
+                                <select id="paymentMethod" class="form-select">
+                                    <option value="cod">Cash on Delivery</option>
+                                    <option value="upi">UPI (Sandbox)</option>
+                                    <option value="razorpay">Razorpay (Sandbox)</option>
+                                    <option value="stripe">Stripe (Sandbox)</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="mb-3">Order Summary</h5>
+                        {% for item in cart_items %}
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <div style="width:56px;height:56px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">
+                                <img src="{{ item.product.image if item.product.image else url_for('static', filename='images/default-product.jpg') }}"
+                                     alt="{{ item.product.name }}"
+                                     style="width:100%;height:100%;object-fit:contain;padding:6px;">
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold small">{{ item.product.name }}</div>
+                                <div class="text-muted small">Qty: {{ item.quantity }} x Rs {{ item.product.price|round|int }}</div>
+                            </div>
+                            <div class="fw-semibold small">Rs {{ item.subtotal|round|int }}</div>
+                        </div>
+                        {% endfor %}
+                        <hr>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal</span>
+                            <strong id="subtotalText">Rs {{ subtotal|round|int }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Shipping</span>
+                            <strong id="shippingText">Rs {{ shipping_charge|round|int }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Discount</span>
+                            <strong id="discountText">- Rs 0</strong>
+                        </div>
+                        <div class="input-group input-group-sm mt-3">
+                            <input type="text" id="couponCode" class="form-control" placeholder="Coupon code (e.g. WELCOME10)">
+                            <button type="button" class="btn btn-outline-dark" id="applyCouponBtn">Apply</button>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="fw-bold">Total</span>
+                            <span class="fw-bold" id="totalText">Rs {{ total|round|int }}</span>
+                        </div>
+                        <button type="button" class="btn btn-brand w-100 py-2" id="placeOrderBtn">Place Order</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let checkoutSubtotal = {{ subtotal|default(0)|float }};
+let checkoutShipping = {{ shipping_charge|default(0)|float }};
+let checkoutDiscount = 0;
+let appliedCoupon = '';
+
+function renderTotals() {
+    const total = Math.max(0, checkoutSubtotal + checkoutShipping - checkoutDiscount);
+    document.getElementById('subtotalText').textContent = `Rs ${Math.round(checkoutSubtotal)}`;
+    document.getElementById('shippingText').textContent = `Rs ${Math.round(checkoutShipping)}`;
+    document.getElementById('discountText').textContent = `- Rs ${Math.round(checkoutDiscount)}`;
+    document.getElementById('totalText').textContent = `Rs ${Math.round(total)}`;
+}
+
+document.getElementById('applyCouponBtn')?.addEventListener('click', function() {
+    const code = document.getElementById('couponCode').value.trim();
+    if (!code) {
+        alert('Enter coupon code');
+        return;
+    }
+    const formData = new FormData();
+    formData.append('code', code);
+    formData.append('subtotal', checkoutSubtotal);
+    formData.append('shipping', checkoutShipping);
+    fetch('/apply_coupon', { method: 'POST', body: formData })
+        .then(r => r.json())
+        .then(data => {
+            if (!data.success) {
+                alert(data.message || 'Coupon invalid');
+                return;
+            }
+            checkoutDiscount = Number(data.discount || 0);
+            appliedCoupon = data.coupon_code || code.toUpperCase();
+            renderTotals();
+            alert(data.message || 'Coupon applied');
+        })
+        .catch(() => alert('Coupon apply failed'));
+});
+
+document.getElementById('placeOrderBtn')?.addEventListener('click', function() {
+    const address = document.getElementById('address').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const pincode = document.getElementById('pincode').value.trim();
+    const paymentMethod = document.getElementById('paymentMethod').value;
+    if (!address || !phone || !pincode) {
+        alert('Please fill address, phone and pincode');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('address', address);
+    formData.append('phone', phone);
+    formData.append('pincode', pincode);
+    formData.append('payment_method', paymentMethod);
+    if (appliedCoupon) formData.append('coupon_code', appliedCoupon);
+
+    this.disabled = true;
+    this.textContent = 'Processing...';
+
+    const continuePlaceOrder = () => {
+        fetch('/place_order', { method: 'POST', body: formData })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = `/order_success/${data.order_id}`;
+                } else {
+                    alert(data.message || 'Failed to place order');
+                    this.disabled = false;
+                    this.textContent = 'Place Order';
+                }
+            })
+            .catch(() => {
+                alert('Failed to place order');
+                this.disabled = false;
+                this.textContent = 'Place Order';
+            });
+    };
+
+    if (paymentMethod !== 'cod') {
+        const totalNumber = checkoutSubtotal + checkoutShipping - checkoutDiscount;
+        const payData = new FormData();
+        payData.append('provider', paymentMethod);
+        payData.append('amount', totalNumber);
+        fetch('/payment/create', { method: 'POST', body: payData })
+            .then(r => r.json())
+            .then(data => {
+                if (!data.success) {
+                    alert(data.message || 'Payment setup failed');
+                    this.disabled = false;
+                    this.textContent = 'Place Order';
+                    return;
+                }
+                // Sandbox flow: just proceed with order after payment setup payload.
+                continuePlaceOrder();
+            })
+            .catch(() => {
+                alert('Payment setup failed');
+                this.disabled = false;
+                this.textContent = 'Place Order';
+            });
+        return;
+    }
+
+    continuePlaceOrder();
+});
+</script>
+{% endblock %}

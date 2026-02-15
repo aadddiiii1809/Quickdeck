@@ -1,0 +1,22 @@
+[
+  {
+    "id": "p-101",
+    "sku": "WK-HEEL-001",
+    "name": "Women Block Heels",
+    "categoryName": "Women Footwear",
+    "sellerName": "Quickdeck Supplier 1",
+    "qcStatus": "APPROVED",
+    "qcReason": null,
+    "createdAt": "2026-02-14T00:00:00.000Z"
+  },
+  {
+    "id": "p-102",
+    "sku": "WK-KURTI-010",
+    "name": "Printed Kurti",
+    "categoryName": "Women Kurtis",
+    "sellerName": "Quickdeck Supplier 2",
+    "qcStatus": "PENDING",
+    "qcReason": null,
+    "createdAt": "2026-02-14T00:00:00.000Z"
+  }
+]

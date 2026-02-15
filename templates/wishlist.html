@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Wishlist - QUICKDECK{% endblock %}
+
+{% block content %}
+<section class="py-4 border-bottom bg-light">
+    <div class="container">
+        <h1 class="serif mb-1">My Wishlist</h1>
+        <p class="text-muted mb-0">Your saved favourites.</p>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        {% if wishlist_items %}
+        <div class="row g-4">
+            {% for p in wishlist_items %}
+            {% set price = p.get('meesho_price') or p.get('price') or 0 %}
+            {% set img = p.get('image_1') or url_for('static', filename='images/default-product.jpg') %}
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="store-card h-100">
+                    <a href="{{ url_for('product_detail', product_id=p._id|string) }}" class="text-decoration-none">
+                        <div class="store-img-wrap">
+                            <img src="{{ img }}" alt="{{ p.get('product_name', 'Product') }}">
+                        </div>
+                        <div class="p-3">
+                            <h6 class="text-dark mb-1">{{ p.get('product_name', 'Product') }}</h6>
+                            <div class="fw-bold">Rs {{ price|round|int }}</div>
+                        </div>
+                    </a>
+                    <div class="px-3 pb-3">
+                        <button class="btn btn-outline-danger btn-sm w-100 remove-wishlist-btn" data-product-id="{{ p._id|string }}">Remove</button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <h4>No items in wishlist</h4>
+            <a href="{{ url_for('products') }}" class="btn btn-brand mt-2">Explore Products</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<style>
+.store-card { background:#fff; border:1px solid #e5e7eb; border-radius:12px; overflow:hidden; transition:.25s ease; }
+.store-card:hover { transform: translateY(-4px); box-shadow: 0 16px 24px rgba(0,0,0,.08); }
+.store-img-wrap { background:#f8fafc; aspect-ratio:3/4; display:flex; align-items:center; justify-content:center; }
+.store-img-wrap img { width:100%; height:100%; object-fit:contain; padding:18px; }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.querySelectorAll('.remove-wishlist-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const pid = this.dataset.productId;
+        fetch(`/wishlist/remove/${pid}`, { method: 'POST' })
+            .then(r => r.json())
+            .then(data => { if (data.success) location.reload(); });
+    });
+});
+</script>
+{% endblock %}

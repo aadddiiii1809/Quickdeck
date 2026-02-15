@@ -1,0 +1,14 @@
+﻿[project]
+name = "repl-nix-workspace"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.11"
+dependencies = [
+    "flask>=3.1.2",
+    "pymongo>=4.15.4",
+    "python-dotenv>=1.2.1",
+    "werkzeug>=3.1.3",
+    "pandas>=2.3.2",
+    "openpyxl>=3.1.5",
+    "psycopg2-binary>=2.9.10",
+]

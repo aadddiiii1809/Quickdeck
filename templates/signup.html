@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Join QUICKDECK | Premium Footwear Community{% endblock %}
+
+{% block content %}
+<section class="auth-section py-6 bg-white">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-5 col-md-8">
+                <div class="card border-0 shadow-lg rounded-0">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-5">
+                            <h2 class="fw-light text-uppercase tracking-widest mb-2">Create Account</h2>
+                            <div class="mx-auto bg-dark" style="width: 40px; height: 1.5px;"></div>
+                            <p class="text-muted small mt-3">Join the global world of premium retail</p>
+                        </div>
+
+                        <form method="POST" action="{{ url_for('signup') }}" class="needs-validation" novalidate>
+                            <div class="row g-3">
+                                <div class="col-12 mb-2">
+                                    <label for="name" class="small text-uppercase fw-bold tracking-wider mb-1">Full Name</label>
+                                    <input type="text" class="form-control rounded-0 border-dark-subtle py-2"
+                                           id="name" name="name" placeholder="Enter your name" required>
+                                    <div class="invalid-feedback small">Please enter your full name.</div>
+                                </div>
+
+                                <div class="col-12 mb-2">
+                                    <label for="email" class="small text-uppercase fw-bold tracking-wider mb-1">Email Address</label>
+                                    <input type="email" class="form-control rounded-0 border-dark-subtle py-2"
+                                           id="email" name="email" placeholder="name@example.com" required>
+                                    <div class="invalid-feedback small">A valid email is required.</div>
+                                </div>
+
+                                <div class="col-12 mb-2">
+                                    <label for="phone" class="small text-uppercase fw-bold tracking-wider mb-1">Phone Number</label>
+                                    <input type="tel" class="form-control rounded-0 border-dark-subtle py-2"
+                                           id="phone" name="phone" placeholder="+91" required>
+                                </div>
+
+                                <div class="col-12 mb-2">
+                                    <label for="address" class="small text-uppercase fw-bold tracking-wider mb-1">Shipping Address</label>
+                                    <textarea class="form-control rounded-0 border-dark-subtle py-2"
+                                              id="address" name="address" rows="2" placeholder="Complete address for delivery" required></textarea>
+                                </div>
+
+                                <div class="col-12 mb-4">
+                                    <label for="password" class="small text-uppercase fw-bold tracking-wider mb-1">Create Password</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control rounded-0 border-dark-subtle py-2"
+                                               id="password" name="password" placeholder="Minimum 6 characters"
+                                               required minlength="6">
+                                        <button class="btn btn-outline-dark rounded-0 border-dark-subtle" type="button" id="togglePassword">
+                                            <i class="far fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    <div class="invalid-feedback small">Password must be at least 6 characters.</div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="form-check">
+                                    <input class="form-check-input rounded-0" type="checkbox" id="terms" required>
+                                    <label class="form-check-label small text-muted" for="terms">
+                                        I agree to the <a href="#" class="text-dark border-bottom text-decoration-none">Terms of Service</a>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-dark w-100 rounded-0 py-3 text-uppercase fw-bold tracking-widest shadow-sm transition-all">
+                                Create Account <i class="fas fa-user-plus ms-2 small"></i>
+                            </button>
+                        </form>
+
+                        <div class="text-center mt-5 pt-4 border-top">
+                            <p class="text-muted small mb-2">Already a member?</p>
+                            <a href="{{ url_for('login') }}" class="text-dark fw-bold text-uppercase small text-decoration-none border-bottom border-dark border-2 pb-1">
+                                Sign In Instead
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    /* Premium UI Components */
+    .py-6 { padding-top: 5rem; padding-bottom: 5rem; }
+    .tracking-wider { letter-spacing: 0.1em; }
+    .tracking-widest { letter-spacing: 0.2em; }
+    .rounded-0 { border-radius: 0 !important; }
+
+    .form-control:focus {
+        border-color: #000;
+        box-shadow: none;
+    }
+
+    .transition-all { transition: 0.3s ease; }
+    .btn-dark:hover { background-color: #333; transform: translateY(-2px); }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // 1. Password Visibility Toggle
+    document.querySelector('#togglePassword').addEventListener('click', function (e) {
+        const passwordField = document.querySelector('#password');
+        const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordField.setAttribute('type', type);
+        this.querySelector('i').classList.toggle('fa-eye-slash');
+    });
+
+    // 2. Client-side Validation
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
+</script>
+{% endblock %}

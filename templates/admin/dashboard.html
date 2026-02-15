@@ -1,0 +1,303 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Dashboard - QUICKDECK Admin{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block page_subtitle %}Performance, sales, orders and inventory in one place{% endblock %}
+
+{% block content %}
+<div class="stats-grid">
+    <div class="stat-card" data-url="{{ url_for('admin_products') }}">
+        <div class="stat-icon" style="background:#22c55e;"><i class="fas fa-box"></i></div>
+        <div class="stat-info">
+            <h3 id="total-products">{{ stats.total_products|default(0) }}</h3>
+            <p>Total Products</p>
+        </div>
+    </div>
+    <div class="stat-card" data-url="{{ url_for('admin_orders') }}">
+        <div class="stat-icon" style="background:#3b82f6;"><i class="fas fa-shopping-cart"></i></div>
+        <div class="stat-info">
+            <h3 id="total-orders">{{ stats.total_orders|default(0) }}</h3>
+            <p>Total Orders</p>
+        </div>
+    </div>
+    <div class="stat-card" data-url="{{ url_for('admin_customers') }}">
+        <div class="stat-icon" style="background:#f59e0b;"><i class="fas fa-users"></i></div>
+        <div class="stat-info">
+            <h3 id="total-customers">{{ stats.total_customers|default(0) }}</h3>
+            <p>Total Customers</p>
+        </div>
+    </div>
+    <div class="stat-card" data-url="{{ url_for('admin_orders') }}">
+        <div class="stat-icon" style="background:#ef4444;"><i class="fas fa-money-bill-wave"></i></div>
+        <div class="stat-info">
+            <h3 id="total-revenue">Rs {{ stats.total_revenue|default(0)|round|int|format_number }}</h3>
+            <p>Total Revenue</p>
+        </div>
+    </div>
+    <div class="stat-card" data-url="{{ url_for('admin_orders') }}">
+        <div class="stat-icon" style="background:#8b5cf6;"><i class="fas fa-clock"></i></div>
+        <div class="stat-info">
+            <h3 id="pending-orders">{{ stats.pending_orders|default(0) }}</h3>
+            <p>Pending Orders</p>
+        </div>
+    </div>
+    <div class="stat-card" data-url="{{ url_for('admin_products') }}">
+        <div class="stat-icon" style="background:#06b6d4;"><i class="fas fa-warehouse"></i></div>
+        <div class="stat-info">
+            <h3 id="inventory-value">Rs {{ stats.total_inventory_value|default(0)|round|int|format_number }}</h3>
+            <p>Inventory Value</p>
+        </div>
+    </div>
+    <div class="stat-card" data-url="{{ url_for('admin_orders') }}">
+        <div class="stat-icon" style="background:#0ea5e9;"><i class="fas fa-chart-line"></i></div>
+        <div class="stat-info">
+            <h3 id="today-revenue">Rs {{ stats.today_revenue|default(0)|round|int|format_number }}</h3>
+            <p>Today's Revenue</p>
+        </div>
+    </div>
+    <div class="stat-card" data-url="{{ url_for('admin_orders') }}">
+        <div class="stat-icon" style="background:#14b8a6;"><i class="fas fa-receipt"></i></div>
+        <div class="stat-info">
+            <h3 id="avg-order-value">Rs {{ stats.avg_order_value|default(0)|round|int|format_number }}</h3>
+            <p>Avg Order Value</p>
+        </div>
+    </div>
+</div>
+
+<div class="data-section mb-4">
+    <div class="card">
+        <div class="card-header"><h3>Sales Trend (Last 7 Days)</h3></div>
+        <div class="card-body"><canvas id="salesTrendChart" height="120"></canvas></div>
+    </div>
+    <div class="card">
+        <div class="card-header"><h3>Order Status Mix</h3></div>
+        <div class="card-body"><canvas id="statusMixChart" height="120"></canvas></div>
+    </div>
+</div>
+
+<div class="data-section">
+    <div class="data-column">
+        <div class="card">
+            <div class="card-header">
+                <h3>Recent Activities</h3>
+                <a href="{{ url_for('admin_activities') }}" class="view-all">View All</a>
+            </div>
+            <div class="card-body">
+                <div class="activities-list" id="activities-list">
+                    {% for activity in activities %}
+                    <div class="activity-item">
+                        <div class="activity-icon"><i class="{{ activity.icon }}"></i></div>
+                        <div class="activity-details">
+                            <p>{{ activity.text }}</p>
+                            <div class="activity-time">{{ activity.time }}</div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="empty-state"><p>No recent activities</p></div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3>Recent Orders</h3>
+                <a href="{{ url_for('admin_orders') }}" class="view-all">View All</a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>Order</th><th>Customer</th><th>Amount</th><th>Status</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for order in recent_orders %}
+                            <tr>
+                                <td>#{{ order._id|string|truncate(8, True, '') }}</td>
+                                <td>{{ order.get('user_name') or order.get('customer_name') or 'Customer' }}</td>
+                                <td>Rs {{ order.get('total_amount', 0)|round|int }}</td>
+                                <td><span class="status-badge status-{{ order.get('status', 'Pending')|lower|replace(' ', '-') }}">{{ order.get('status', 'Pending') }}</span></td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="4" class="empty-state">No recent orders</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="data-column">
+        <div class="card">
+            <div class="card-header">
+                <h3>Low Stock Products</h3>
+                <a href="{{ url_for('admin_products') }}" class="view-all">Open Catalog</a>
+            </div>
+            <div class="card-body">
+                <div class="products-list">
+                    {% for product in low_stock_products %}
+                    {% set raw_image = product.get('image_1') or product.get('image') %}
+                    {% if raw_image is sequence and raw_image is not string %}
+                    {% set raw_image = raw_image[0] if raw_image else '' %}
+                    {% endif %}
+                    {% set image_src = (raw_image|string).strip() %}
+                    <div class="product-item">
+                        <div class="product-image">
+                            <img src="{% if image_src.startswith('http://') or image_src.startswith('https://') or image_src.startswith('/static/') %}{{ image_src }}{% elif image_src.startswith('images/') %}{{ url_for('static', filename=image_src) }}{% else %}{{ url_for('static', filename='images/default-product.jpg') }}{% endif %}" alt="Product">
+                        </div>
+                        <div class="product-info">
+                            <h4>{{ product.get('product_name') or product.get('name') or 'Unnamed Product' }}</h4>
+                            <div class="product-meta">
+                                <span class="stock-level stock-low">{{ product.get('inventory') or product.get('stock') or 0 }} left</span>
+                                <span class="price">Rs {{ (product.get('meesho_price') or product.get('price') or 0)|round|int }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="empty-state"><p>All products have sufficient stock.</p></div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h3>Top Selling Products</h3></div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>Product</th><th>Units</th><th>Revenue</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for p in top_products %}
+                            <tr>
+                                <td>{{ p.get('name', 'Product') }}</td>
+                                <td>{{ p.get('total_sold', 0) }}</td>
+                                <td>Rs {{ p.get('total_revenue', 0)|round|int }}</td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="3" class="empty-state">No sales data yet</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-bottom:24px; }
+.stat-card { background:#fff; border-radius:12px; padding:18px; box-shadow:0 2px 10px rgba(0,0,0,.05); display:flex; align-items:center; gap:12px; cursor:pointer; }
+.stat-card:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(0,0,0,.08); }
+.stat-icon { width:46px; height:46px; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#fff; }
+.stat-info h3 { margin:0; font-size:28px; color:#1f2937; }
+.stat-info p { margin:0; color:#64748b; font-size:13px; }
+.data-section { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.data-column { display:flex; flex-direction:column; gap:16px; }
+.card { border:0; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,.05); }
+.card-header { background:#fff; border-bottom:1px solid #e2e8f0; padding:16px 18px; display:flex; justify-content:space-between; align-items:center; }
+.card-header h3 { margin:0; font-size:17px; }
+.card-body { padding:16px 18px; }
+.view-all { color:#3b82f6; text-decoration:none; font-size:13px; font-weight:600; }
+.activities-list,.products-list { display:flex; flex-direction:column; gap:12px; }
+.activity-item,.product-item { display:flex; gap:12px; border-bottom:1px solid #f1f5f9; padding-bottom:10px; }
+.activity-icon { width:34px; height:34px; border-radius:8px; background:#eff6ff; color:#2563eb; display:flex; align-items:center; justify-content:center; }
+.activity-details p { margin:0; font-size:14px; color:#334155; }
+.activity-time { font-size:12px; color:#94a3b8; }
+.product-image { width:48px; height:48px; border-radius:8px; overflow:hidden; flex-shrink:0; }
+.product-image img { width:100%; height:100%; object-fit:cover; }
+.product-info h4 { margin:0 0 4px; font-size:14px; }
+.product-meta { display:flex; gap:10px; font-size:12px; }
+.stock-level { background:#fee2e2; color:#991b1b; border-radius:999px; padding:2px 8px; font-weight:600; }
+.price { color:#0f766e; font-weight:700; }
+.status-badge { padding:3px 8px; border-radius:999px; font-size:11px; font-weight:700; }
+.status-pending { background:#fef3c7; color:#92400e; }
+.status-processing { background:#dbeafe; color:#1e3a8a; }
+.status-shipped { background:#cffafe; color:#155e75; }
+.status-delivered { background:#dcfce7; color:#166534; }
+.status-cancelled { background:#fee2e2; color:#991b1b; }
+.empty-state { text-align:center; color:#94a3b8; }
+@media (max-width: 1100px) { .data-section { grid-template-columns:1fr; } }
+@media (max-width: 768px) { .stats-grid { grid-template-columns:1fr 1fr; } }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script id="dashboard-chart-data" type="application/json">
+{{ {
+    "dailyLabels": daily_labels,
+    "dailyRevenue": daily_revenue,
+    "dailyOrders": daily_orders,
+    "statusStats": order_status_stats
+} | tojson }}
+</script>
+<script>
+const chartDataNode = document.getElementById('dashboard-chart-data');
+const chartData = chartDataNode ? JSON.parse(chartDataNode.textContent || '{}') : {};
+const dailyLabels = chartData.dailyLabels || [];
+const dailyRevenue = chartData.dailyRevenue || [];
+const dailyOrders = chartData.dailyOrders || [];
+const statusStats = chartData.statusStats || {};
+
+function formatNumber(num) {
+    return Number(num || 0).toLocaleString();
+}
+
+function refreshDashboardStats() {
+    fetch('/admin/api/stats')
+        .then(r => r.json())
+        .then(data => {
+            if (!data.success) return;
+            const setText = (id, value) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = value;
+            };
+            setText('total-products', data.total_products);
+            setText('total-orders', data.total_orders);
+            setText('total-customers', data.total_customers);
+            setText('pending-orders', data.pending_orders);
+            setText('total-revenue', 'Rs ' + formatNumber(data.total_revenue));
+            setText('inventory-value', 'Rs ' + formatNumber(data.total_inventory_value));
+            setText('today-revenue', 'Rs ' + formatNumber(data.today_revenue));
+            setText('avg-order-value', 'Rs ' + formatNumber(Math.round(data.avg_order_value || 0)));
+        })
+        .catch(() => {});
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.stat-card[data-url]').forEach(card => {
+        card.addEventListener('click', () => window.location.href = card.dataset.url);
+    });
+
+    const salesCtx = document.getElementById('salesTrendChart');
+    if (salesCtx) {
+        new Chart(salesCtx, {
+            type: 'line',
+            data: {
+                labels: dailyLabels,
+                datasets: [
+                    { label: 'Revenue', data: dailyRevenue, borderColor: '#4361ee', backgroundColor: 'rgba(67,97,238,.15)', fill: true, tension: .35 },
+                    { label: 'Orders', data: dailyOrders, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,.12)', fill: true, tension: .35 }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    }
+
+    const statusCtx = document.getElementById('statusMixChart');
+    if (statusCtx) {
+        new Chart(statusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(statusStats),
+                datasets: [{ data: Object.values(statusStats), backgroundColor: ['#f59e0b','#3b82f6','#10b981','#ef4444','#8b5cf6'] }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    }
+
+    setInterval(refreshDashboardStats, 30000);
+});
+</script>
+{% endblock %}
