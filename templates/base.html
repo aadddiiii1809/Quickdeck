@@ -49,12 +49,14 @@
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            min-height: 44px;
+            min-height: 0;
         }
 
         .brand-logo img {
-            max-height: 52px;
+            height: 44px;
             width: auto;
+            max-width: 220px;
+            object-fit: contain;
             display: block;
         }
 
@@ -193,6 +195,22 @@
 
         .footer-link:hover {
             color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .top-strip {
+                display: none;
+            }
+
+            .main-header .container {
+                padding-top: 10px !important;
+                padding-bottom: 10px !important;
+            }
+
+            .brand-logo img {
+                height: 36px;
+                max-width: 170px;
+            }
         }
     </style>
     {% block extra_css %}{% endblock %}
