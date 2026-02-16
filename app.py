@@ -1116,6 +1116,28 @@ def test_structure():
     return result
 
 
+# --- HEALTH CHECK ROUTE ---
+@app.route('/health')
+def health():
+    """Lightweight health endpoint for uptime monitors."""
+    try:
+        client.admin.command('ping')
+        return jsonify({
+            'status': 'ok',
+            'service': 'quickdeck',
+            'time': datetime.utcnow().isoformat() + 'Z',
+            'database': 'connected'
+        }), 200
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'service': 'quickdeck',
+            'time': datetime.utcnow().isoformat() + 'Z',
+            'database': 'disconnected',
+            'error': str(e)
+        }), 500
+
+
 # --- ADMIN LOGIN ROUTE ---
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
