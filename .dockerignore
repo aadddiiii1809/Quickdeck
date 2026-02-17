@@ -1,0 +1,10 @@
+.git
+.gitignore
+.venv
+venv
+__pycache__
+*.pyc
+.env
+node_modules
+catalog_portal/nextjs/node_modules
+catalog_portal/nextjs/.next
