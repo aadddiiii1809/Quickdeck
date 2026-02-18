@@ -505,14 +505,10 @@
 
         <div class="nav-section">
             <div class="nav-label">Quick Actions</div>
-            <a href="{{ url_for('admin_add_product') }}" class="nav-item {% if request.endpoint == 'admin_add_product' %}active{% endif %}">
-                <i class="bi bi-plus-circle"></i>
-                <span>Add Product</span>
-                <span class="nav-badge success">New</span>
-            </a>
             <a href="{{ url_for('admin_bulk_upload') }}" class="nav-item {% if request.endpoint == 'admin_bulk_upload' %}active{% endif %}">
                 <i class="bi bi-cloud-upload"></i>
-                <span>Bulk Upload</span>
+                <span>Catalog Upload</span>
+                <span class="nav-badge success">One</span>
             </a>
         </div>
 

@@ -1,18 +1,28 @@
 {% extends "admin/base.html" %}
 
-{% block title %}Bulk Upload - QUICKDECK Admin{% endblock %}
-{% block page_title %}Bulk Upload{% endblock %}
-{% block page_subtitle %}Upload multiple listings at once with mandatory attributes.{% endblock %}
+{% block title %}Catalog Upload - QUICKDECK Admin{% endblock %}
+{% block page_title %}Catalog Upload{% endblock %}
+{% block page_subtitle %}Use one portal for both single and bulk catalog listing.{% endblock %}
 
 {% block breadcrumb %}
-<li class="breadcrumb-item active">Bulk Upload</li>
+<li class="breadcrumb-item active">Catalog Upload</li>
 {% endblock %}
 
 {% block content %}
 <div class="container-fluid px-0">
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="mb-2"><i class="fas fa-plus-circle me-2"></i>Single Listing Upload</h5>
+            <p class="text-muted mb-3">Add one product with detailed attributes, sizes, and multiple images.</p>
+            <a href="{{ url_for('admin_add_product') }}" class="btn btn-admin btn-admin-primary">
+                <i class="fas fa-arrow-right me-2"></i>Open Single Upload Form
+            </a>
+        </div>
+    </div>
+
     <div class="card">
         <div class="card-body">
-            <h5 class="mb-3"><i class="fas fa-file-upload me-2"></i>Upload CSV or XLSX</h5>
+            <h5 class="mb-3"><i class="fas fa-file-upload me-2"></i>Bulk Listing Upload (CSV/XLSX)</h5>
             <form method="POST" enctype="multipart/form-data">
                 <div class="mb-3">
                     <label class="form-label fw-bold">File</label>
